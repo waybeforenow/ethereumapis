@@ -36,7 +36,7 @@ option php_namespace = "Ethereum\\Eth\\v1alpha1";
 service BeaconChain {
     // TODO(preston): Batch requests?
 
-    // Retrieve attestations by block root, slot, or epoch. 
+    // Retrieve attestations by block root, or slot. 
     // 
     // The server may return an empty list when no attestations match the given 
     // filter criteria. This RPC should not return NOT_FOUND. Only one filter 
