@@ -54,7 +54,7 @@ go_repository(
 
 go_repository(
     name = "com_github_ferranbt_fastssz",
-    commit = "06015a5d84f9e4eefe2c21377ca678fa8f1a1b09",
+    commit = "08b24206d543953bad33e93b33ee23f9fd764204",
     importpath = "github.com/ferranbt/fastssz",
 )
 

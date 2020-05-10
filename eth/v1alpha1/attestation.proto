@@ -16,6 +16,7 @@ syntax = "proto3";
 package ethereum.eth.v1alpha1;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "eth/v1alpha1/shard.proto";
 
 option csharp_namespace = "Ethereum.Eth.v1alpha1";
 option go_package = "github.com/prysmaticlabs/ethereumapis/eth/v1alpha1;eth";
@@ -31,8 +32,10 @@ message Attestation {
 
     AttestationData data = 2;
 
+    bytes custody_bits_blocks = 3 [(gogoproto.moretags) = "ssz-max:\"2048\""];
+
     // 96 byte BLS aggregate signature.
-    bytes signature = 3 [(gogoproto.moretags) = "ssz-size:\"96\""];
+    bytes signature = 4 [(gogoproto.moretags) = "ssz-size:\"96\""];
 }
 
 message AggregateAttestationAndProof {
@@ -102,4 +105,37 @@ message Checkpoint {
 
     // Block root of the checkpoint references.
     bytes root = 2 [(gogoproto.moretags) = "ssz-size:\"32\""];
+}
+
+message FullAttestation {
+    // A bitfield representation of validator indices that have voted exactly
+    // the same vote and have been aggregated into this attestation.
+    bytes aggregation_bits = 1 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitlist"];
+
+    FullAttestationData data = 2;
+
+    repeated bytes custody_bits_blocks = 3;
+
+    // 96 byte BLS aggregate signature.
+    bytes signature = 4 [(gogoproto.moretags) = "ssz-size:\"96\""];
+}
+
+message FullAttestationData {
+    // Slot of the attestation attesting for.
+    uint64 slot = 1;
+
+    // The committee index that submitted this attestation.
+    uint64 committee_index = 2;
+
+    // 32 byte root of the LMD GHOST block vote.
+    bytes beacon_block_root = 3 [(gogoproto.moretags) = "ssz-size:\"32\""];
+
+    // The most recent justified checkpoint in the beacon state
+    Checkpoint source = 4;
+
+    // The checkpoint attempting to be justified for the current epoch and its epoch boundary block
+    Checkpoint target = 5;
+
+    // The shard transition object itself that this attestation is voting for.
+    ShardTransition shard_transition = 6;
 }
