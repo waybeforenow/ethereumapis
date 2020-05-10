@@ -18,6 +18,88 @@ var (
 	errSize                = fmt.Errorf("incorrect size")
 )
 
+// MarshalSSZ ssz marshals the Validator object
+func (v *Validator) MarshalSSZ() ([]byte, error) {
+	buf := make([]byte, v.SizeSSZ())
+	return v.MarshalSSZTo(buf[:0])
+}
+
+// MarshalSSZTo ssz marshals the Validator object to a target array
+func (v *Validator) MarshalSSZTo(dst []byte) ([]byte, error) {
+	var err error
+
+	// Field (0) 'PublicKey'
+	if dst, err = ssz.MarshalFixedBytes(dst, v.PublicKey, 48); err != nil {
+		return nil, errMarshalFixedBytes
+	}
+
+	// Field (1) 'WithdrawalCredentials'
+	if dst, err = ssz.MarshalFixedBytes(dst, v.WithdrawalCredentials, 32); err != nil {
+		return nil, errMarshalFixedBytes
+	}
+
+	// Field (2) 'EffectiveBalance'
+	dst = ssz.MarshalUint64(dst, v.EffectiveBalance)
+
+	// Field (3) 'Slashed'
+	dst = ssz.MarshalBool(dst, v.Slashed)
+
+	// Field (4) 'ActivationEligibilityEpoch'
+	dst = ssz.MarshalUint64(dst, v.ActivationEligibilityEpoch)
+
+	// Field (5) 'ActivationEpoch'
+	dst = ssz.MarshalUint64(dst, v.ActivationEpoch)
+
+	// Field (6) 'ExitEpoch'
+	dst = ssz.MarshalUint64(dst, v.ExitEpoch)
+
+	// Field (7) 'WithdrawableEpoch'
+	dst = ssz.MarshalUint64(dst, v.WithdrawableEpoch)
+
+	return dst, err
+}
+
+// UnmarshalSSZ ssz unmarshals the Validator object
+func (v *Validator) UnmarshalSSZ(buf []byte) error {
+	var err error
+	size := uint64(len(buf))
+	if size != 121 {
+		return errSize
+	}
+
+	// Field (0) 'PublicKey'
+	v.PublicKey = append(v.PublicKey, buf[0:48]...)
+
+	// Field (1) 'WithdrawalCredentials'
+	v.WithdrawalCredentials = append(v.WithdrawalCredentials, buf[48:80]...)
+
+	// Field (2) 'EffectiveBalance'
+	v.EffectiveBalance = ssz.UnmarshallUint64(buf[80:88])
+
+	// Field (3) 'Slashed'
+	v.Slashed = ssz.UnmarshalBool(buf[88:89])
+
+	// Field (4) 'ActivationEligibilityEpoch'
+	v.ActivationEligibilityEpoch = ssz.UnmarshallUint64(buf[89:97])
+
+	// Field (5) 'ActivationEpoch'
+	v.ActivationEpoch = ssz.UnmarshallUint64(buf[97:105])
+
+	// Field (6) 'ExitEpoch'
+	v.ExitEpoch = ssz.UnmarshallUint64(buf[105:113])
+
+	// Field (7) 'WithdrawableEpoch'
+	v.WithdrawableEpoch = ssz.UnmarshallUint64(buf[113:121])
+
+	return err
+}
+
+// SizeSSZ returns the ssz encoded size in bytes for the Validator object
+func (v *Validator) SizeSSZ() (size int) {
+	size = 121
+	return
+}
+
 // MarshalSSZ ssz marshals the Attestation object
 func (a *Attestation) MarshalSSZ() ([]byte, error) {
 	buf := make([]byte, a.SizeSSZ())
@@ -27,27 +109,34 @@ func (a *Attestation) MarshalSSZ() ([]byte, error) {
 // MarshalSSZTo ssz marshals the Attestation object to a target array
 func (a *Attestation) MarshalSSZTo(dst []byte) ([]byte, error) {
 	var err error
-	offset := int(228)
+	offset := int(296)
 
 	// Offset (0) 'AggregationBits'
 	dst = ssz.WriteOffset(dst, offset)
 	offset += len(a.AggregationBits)
 
 	// Field (1) 'Data'
-	if a.Data == nil {
-		a.Data = new(AttestationData)
-	}
 	if dst, err = a.Data.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
 
-	// Field (2) 'Signature'
+	// Offset (2) 'CustodyBitsBlocks'
+	dst = ssz.WriteOffset(dst, offset)
+	offset += len(a.CustodyBitsBlocks)
+
+	// Field (3) 'Signature'
 	if dst, err = ssz.MarshalFixedBytes(dst, a.Signature, 96); err != nil {
 		return nil, errMarshalFixedBytes
 	}
 
 	// Field (0) 'AggregationBits'
 	dst = append(dst, a.AggregationBits...)
+
+	// Field (2) 'CustodyBitsBlocks'
+	if len(a.CustodyBitsBlocks) > 2048 {
+		return nil, errMarshalDynamicBytes
+	}
+	dst = append(dst, a.CustodyBitsBlocks...)
 
 	return dst, err
 }
@@ -56,12 +145,12 @@ func (a *Attestation) MarshalSSZTo(dst []byte) ([]byte, error) {
 func (a *Attestation) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size < 228 {
+	if size < 296 {
 		return errSize
 	}
 
 	tail := buf
-	var o0 uint64
+	var o0, o2 uint64
 
 	// Offset (0) 'AggregationBits'
 	if o0 = ssz.ReadOffset(buf[0:4]); o0 > size {
@@ -72,27 +161,41 @@ func (a *Attestation) UnmarshalSSZ(buf []byte) error {
 	if a.Data == nil {
 		a.Data = new(AttestationData)
 	}
-	if err = a.Data.UnmarshalSSZ(buf[4:132]); err != nil {
+	if err = a.Data.UnmarshalSSZ(buf[4:196]); err != nil {
 		return err
 	}
 
-	// Field (2) 'Signature'
-	a.Signature = append(a.Signature, buf[132:228]...)
+	// Offset (2) 'CustodyBitsBlocks'
+	if o2 = ssz.ReadOffset(buf[196:200]); o2 > size || o0 > o2 {
+		return errOffset
+	}
+
+	// Field (3) 'Signature'
+	a.Signature = append(a.Signature, buf[200:296]...)
 
 	// Field (0) 'AggregationBits'
 	{
-		buf = tail[o0:]
+		buf = tail[o0:o2]
 		a.AggregationBits = append(a.AggregationBits, buf...)
+	}
+
+	// Field (2) 'CustodyBitsBlocks'
+	{
+		buf = tail[o2:]
+		a.CustodyBitsBlocks = append(a.CustodyBitsBlocks, buf...)
 	}
 	return err
 }
 
 // SizeSSZ returns the ssz encoded size in bytes for the Attestation object
 func (a *Attestation) SizeSSZ() (size int) {
-	size = 228
+	size = 296
 
 	// Field (0) 'AggregationBits'
 	size += len(a.AggregationBits)
+
+	// Field (2) 'CustodyBitsBlocks'
+	size += len(a.CustodyBitsBlocks)
 
 	return
 }
@@ -119,19 +222,23 @@ func (a *AttestationData) MarshalSSZTo(dst []byte) ([]byte, error) {
 	}
 
 	// Field (3) 'Source'
-	if a.Source == nil {
-		a.Source = new(Checkpoint)
-	}
 	if dst, err = a.Source.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
 
 	// Field (4) 'Target'
-	if a.Target == nil {
-		a.Target = new(Checkpoint)
-	}
 	if dst, err = a.Target.MarshalSSZTo(dst); err != nil {
 		return nil, err
+	}
+
+	// Field (5) 'ShardHeadRoot'
+	if dst, err = ssz.MarshalFixedBytes(dst, a.ShardHeadRoot, 32); err != nil {
+		return nil, errMarshalFixedBytes
+	}
+
+	// Field (6) 'ShardTransitionRoot'
+	if dst, err = ssz.MarshalFixedBytes(dst, a.ShardTransitionRoot, 32); err != nil {
+		return nil, errMarshalFixedBytes
 	}
 
 	return dst, err
@@ -141,7 +248,7 @@ func (a *AttestationData) MarshalSSZTo(dst []byte) ([]byte, error) {
 func (a *AttestationData) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size != 128 {
+	if size != 192 {
 		return errSize
 	}
 
@@ -170,12 +277,18 @@ func (a *AttestationData) UnmarshalSSZ(buf []byte) error {
 		return err
 	}
 
+	// Field (5) 'ShardHeadRoot'
+	a.ShardHeadRoot = append(a.ShardHeadRoot, buf[128:160]...)
+
+	// Field (6) 'ShardTransitionRoot'
+	a.ShardTransitionRoot = append(a.ShardTransitionRoot, buf[160:192]...)
+
 	return err
 }
 
 // SizeSSZ returns the ssz encoded size in bytes for the AttestationData object
 func (a *AttestationData) SizeSSZ() (size int) {
-	size = 128
+	size = 192
 	return
 }
 
@@ -223,6 +336,207 @@ func (c *Checkpoint) SizeSSZ() (size int) {
 	return
 }
 
+// MarshalSSZ ssz marshals the ShardState object
+func (s *ShardState) MarshalSSZ() ([]byte, error) {
+	buf := make([]byte, s.SizeSSZ())
+	return s.MarshalSSZTo(buf[:0])
+}
+
+// MarshalSSZTo ssz marshals the ShardState object to a target array
+func (s *ShardState) MarshalSSZTo(dst []byte) ([]byte, error) {
+	var err error
+
+	// Field (0) 'Slot'
+	dst = ssz.MarshalUint64(dst, s.Slot)
+
+	// Field (1) 'GasPrice'
+	dst = ssz.MarshalUint64(dst, s.GasPrice)
+
+	// Field (2) 'TransitionDigest'
+	if dst, err = ssz.MarshalFixedBytes(dst, s.TransitionDigest, 32); err != nil {
+		return nil, errMarshalFixedBytes
+	}
+
+	// Field (3) 'LatestBlockRoot'
+	if dst, err = ssz.MarshalFixedBytes(dst, s.LatestBlockRoot, 32); err != nil {
+		return nil, errMarshalFixedBytes
+	}
+
+	return dst, err
+}
+
+// UnmarshalSSZ ssz unmarshals the ShardState object
+func (s *ShardState) UnmarshalSSZ(buf []byte) error {
+	var err error
+	size := uint64(len(buf))
+	if size != 80 {
+		return errSize
+	}
+
+	// Field (0) 'Slot'
+	s.Slot = ssz.UnmarshallUint64(buf[0:8])
+
+	// Field (1) 'GasPrice'
+	s.GasPrice = ssz.UnmarshallUint64(buf[8:16])
+
+	// Field (2) 'TransitionDigest'
+	s.TransitionDigest = append(s.TransitionDigest, buf[16:48]...)
+
+	// Field (3) 'LatestBlockRoot'
+	s.LatestBlockRoot = append(s.LatestBlockRoot, buf[48:80]...)
+
+	return err
+}
+
+// SizeSSZ returns the ssz encoded size in bytes for the ShardState object
+func (s *ShardState) SizeSSZ() (size int) {
+	size = 80
+	return
+}
+
+// MarshalSSZ ssz marshals the ShardTransition object
+func (s *ShardTransition) MarshalSSZ() ([]byte, error) {
+	buf := make([]byte, s.SizeSSZ())
+	return s.MarshalSSZTo(buf[:0])
+}
+
+// MarshalSSZTo ssz marshals the ShardTransition object to a target array
+func (s *ShardTransition) MarshalSSZTo(dst []byte) ([]byte, error) {
+	var err error
+	offset := int(65648)
+
+	// Field (0) 'StartSlot'
+	dst = ssz.MarshalUint64(dst, s.StartSlot)
+
+	// Offset (1) 'ShardBlockLengths'
+	dst = ssz.WriteOffset(dst, offset)
+	offset += len(s.ShardBlockLengths) * 8
+
+	// Field (2) 'ShardDataRoots'
+	if len(s.ShardDataRoots) != 32 {
+		return nil, errMarshalVector
+	}
+	for ii := 0; ii < 32; ii++ {
+		if dst, err = ssz.MarshalFixedBytes(dst, s.ShardDataRoots[ii], 2048); err != nil {
+			return nil, errMarshalFixedBytes
+		}
+	}
+
+	// Offset (3) 'ShardStates'
+	dst = ssz.WriteOffset(dst, offset)
+	offset += len(s.ShardStates) * 80
+
+	// Field (4) 'ProposerSignatureAggregate'
+	if dst, err = ssz.MarshalFixedBytes(dst, s.ProposerSignatureAggregate, 96); err != nil {
+		return nil, errMarshalFixedBytes
+	}
+
+	// Field (1) 'ShardBlockLengths'
+	if len(s.ShardBlockLengths) > 2048 {
+		return nil, errMarshalList
+	}
+	for ii := 0; ii < len(s.ShardBlockLengths); ii++ {
+		dst = ssz.MarshalUint64(dst, s.ShardBlockLengths[ii])
+	}
+
+	// Field (3) 'ShardStates'
+	if len(s.ShardStates) > 2048 {
+		return nil, errMarshalList
+	}
+	for ii := 0; ii < len(s.ShardStates); ii++ {
+		if dst, err = s.ShardStates[ii].MarshalSSZTo(dst); err != nil {
+			return nil, err
+		}
+	}
+
+	return dst, err
+}
+
+// UnmarshalSSZ ssz unmarshals the ShardTransition object
+func (s *ShardTransition) UnmarshalSSZ(buf []byte) error {
+	var err error
+	size := uint64(len(buf))
+	if size < 65648 {
+		return errSize
+	}
+
+	tail := buf
+	var o1, o3 uint64
+
+	// Field (0) 'StartSlot'
+	s.StartSlot = ssz.UnmarshallUint64(buf[0:8])
+
+	// Offset (1) 'ShardBlockLengths'
+	if o1 = ssz.ReadOffset(buf[8:12]); o1 > size {
+		return errOffset
+	}
+
+	// Field (2) 'ShardDataRoots'
+	s.ShardDataRoots = make([][]byte, 32)
+	for ii := 0; ii < 32; ii++ {
+		s.ShardDataRoots[ii] = append(s.ShardDataRoots[ii], buf[12:65548][ii*2048:(ii+1)*2048]...)
+	}
+
+	// Offset (3) 'ShardStates'
+	if o3 = ssz.ReadOffset(buf[65548:65552]); o3 > size || o1 > o3 {
+		return errOffset
+	}
+
+	// Field (4) 'ProposerSignatureAggregate'
+	s.ProposerSignatureAggregate = append(s.ProposerSignatureAggregate, buf[65552:65648]...)
+
+	// Field (1) 'ShardBlockLengths'
+	{
+		buf = tail[o1:o3]
+		num, ok := ssz.DivideInt(len(buf), 8)
+		if !ok {
+			return errDivideInt
+		}
+		if num > 2048 {
+			return errListTooBig
+		}
+		s.ShardBlockLengths = ssz.ExtendUint64(s.ShardBlockLengths, num)
+		for ii := 0; ii < num; ii++ {
+			s.ShardBlockLengths[ii] = ssz.UnmarshallUint64(buf[ii*8 : (ii+1)*8])
+		}
+	}
+
+	// Field (3) 'ShardStates'
+	{
+		buf = tail[o3:]
+		num, ok := ssz.DivideInt(len(buf), 80)
+		if !ok {
+			return errDivideInt
+		}
+		if num > 2048 {
+			return errListTooBig
+		}
+		s.ShardStates = make([]*ShardState, num)
+		for ii := 0; ii < num; ii++ {
+			if s.ShardStates[ii] == nil {
+				s.ShardStates[ii] = new(ShardState)
+			}
+			if err = s.ShardStates[ii].UnmarshalSSZ(buf[ii*80 : (ii+1)*80]); err != nil {
+				return err
+			}
+		}
+	}
+	return err
+}
+
+// SizeSSZ returns the ssz encoded size in bytes for the ShardTransition object
+func (s *ShardTransition) SizeSSZ() (size int) {
+	size = 65648
+
+	// Field (1) 'ShardBlockLengths'
+	size += len(s.ShardBlockLengths) * 8
+
+	// Field (3) 'ShardStates'
+	size += len(s.ShardStates) * 80
+
+	return
+}
+
 // MarshalSSZ ssz marshals the BeaconBlock object
 func (b *BeaconBlock) MarshalSSZ() ([]byte, error) {
 	buf := make([]byte, b.SizeSSZ())
@@ -252,9 +566,6 @@ func (b *BeaconBlock) MarshalSSZTo(dst []byte) ([]byte, error) {
 
 	// Offset (4) 'Body'
 	dst = ssz.WriteOffset(dst, offset)
-	if b.Body == nil {
-		b.Body = new(BeaconBlockBody)
-	}
 	offset += b.Body.SizeSSZ()
 
 	// Field (4) 'Body'
@@ -311,9 +622,6 @@ func (b *BeaconBlock) SizeSSZ() (size int) {
 	size = 84
 
 	// Field (4) 'Body'
-	if b.Body == nil {
-		b.Body = new(BeaconBlockBody)
-	}
 	size += b.Body.SizeSSZ()
 
 	return
@@ -332,9 +640,6 @@ func (s *SignedBeaconBlock) MarshalSSZTo(dst []byte) ([]byte, error) {
 
 	// Offset (0) 'Block'
 	dst = ssz.WriteOffset(dst, offset)
-	if s.Block == nil {
-		s.Block = new(BeaconBlock)
-	}
 	offset += s.Block.SizeSSZ()
 
 	// Field (1) 'Signature'
@@ -387,9 +692,6 @@ func (s *SignedBeaconBlock) SizeSSZ() (size int) {
 	size = 100
 
 	// Field (0) 'Block'
-	if s.Block == nil {
-		s.Block = new(BeaconBlock)
-	}
 	size += s.Block.SizeSSZ()
 
 	return
@@ -404,7 +706,7 @@ func (b *BeaconBlockBody) MarshalSSZ() ([]byte, error) {
 // MarshalSSZTo ssz marshals the BeaconBlockBody object to a target array
 func (b *BeaconBlockBody) MarshalSSZTo(dst []byte) ([]byte, error) {
 	var err error
-	offset := int(220)
+	offset := int(224)
 
 	// Field (0) 'RandaoReveal'
 	if dst, err = ssz.MarshalFixedBytes(dst, b.RandaoReveal, 96); err != nil {
@@ -412,9 +714,6 @@ func (b *BeaconBlockBody) MarshalSSZTo(dst []byte) ([]byte, error) {
 	}
 
 	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(Eth1Data)
-	}
 	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
@@ -449,6 +748,13 @@ func (b *BeaconBlockBody) MarshalSSZTo(dst []byte) ([]byte, error) {
 	// Offset (7) 'VoluntaryExits'
 	dst = ssz.WriteOffset(dst, offset)
 	offset += len(b.VoluntaryExits) * 112
+
+	// Offset (8) 'ShardTransitions'
+	dst = ssz.WriteOffset(dst, offset)
+	for ii := 0; ii < len(b.ShardTransitions); ii++ {
+		offset += 4
+		offset += b.ShardTransitions[ii].SizeSSZ()
+	}
 
 	// Field (3) 'ProposerSlashings'
 	if len(b.ProposerSlashings) > 16 {
@@ -514,6 +820,23 @@ func (b *BeaconBlockBody) MarshalSSZTo(dst []byte) ([]byte, error) {
 		}
 	}
 
+	// Field (8) 'ShardTransitions'
+	if len(b.ShardTransitions) > 64 {
+		return nil, errMarshalList
+	}
+	{
+		offset = 4 * len(b.ShardTransitions)
+		for ii := 0; ii < len(b.ShardTransitions); ii++ {
+			dst = ssz.WriteOffset(dst, offset)
+			offset += b.ShardTransitions[ii].SizeSSZ()
+		}
+	}
+	for ii := 0; ii < len(b.ShardTransitions); ii++ {
+		if dst, err = b.ShardTransitions[ii].MarshalSSZTo(dst); err != nil {
+			return nil, err
+		}
+	}
+
 	return dst, err
 }
 
@@ -521,12 +844,12 @@ func (b *BeaconBlockBody) MarshalSSZTo(dst []byte) ([]byte, error) {
 func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size < 220 {
+	if size < 224 {
 		return errSize
 	}
 
 	tail := buf
-	var o3, o4, o5, o6, o7 uint64
+	var o3, o4, o5, o6, o7, o8 uint64
 
 	// Field (0) 'RandaoReveal'
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:96]...)
@@ -564,6 +887,11 @@ func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 
 	// Offset (7) 'VoluntaryExits'
 	if o7 = ssz.ReadOffset(buf[216:220]); o7 > size || o6 > o7 {
+		return errOffset
+	}
+
+	// Offset (8) 'ShardTransitions'
+	if o8 = ssz.ReadOffset(buf[220:224]); o8 > size || o7 > o8 {
 		return errOffset
 	}
 
@@ -655,7 +983,7 @@ func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 
 	// Field (7) 'VoluntaryExits'
 	{
-		buf = tail[o7:]
+		buf = tail[o7:o8]
 		num, ok := ssz.DivideInt(len(buf), 112)
 		if !ok {
 			return errDivideInt
@@ -673,12 +1001,34 @@ func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 			}
 		}
 	}
+
+	// Field (8) 'ShardTransitions'
+	{
+		buf = tail[o8:]
+		num, err := ssz.DecodeDynamicLength(buf, 64)
+		if err != nil {
+			return err
+		}
+		b.ShardTransitions = make([]*ShardTransition, num)
+		err = ssz.UnmarshalDynamic(buf, num, func(indx int, buf []byte) (err error) {
+			if b.ShardTransitions[indx] == nil {
+				b.ShardTransitions[indx] = new(ShardTransition)
+			}
+			if err = b.ShardTransitions[indx].UnmarshalSSZ(buf); err != nil {
+				return err
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
 	return err
 }
 
 // SizeSSZ returns the ssz encoded size in bytes for the BeaconBlockBody object
 func (b *BeaconBlockBody) SizeSSZ() (size int) {
-	size = 220
+	size = 224
 
 	// Field (3) 'ProposerSlashings'
 	size += len(b.ProposerSlashings) * 416
@@ -701,6 +1051,12 @@ func (b *BeaconBlockBody) SizeSSZ() (size int) {
 	// Field (7) 'VoluntaryExits'
 	size += len(b.VoluntaryExits) * 112
 
+	// Field (8) 'ShardTransitions'
+	for ii := 0; ii < len(b.ShardTransitions); ii++ {
+		size += 4
+		size += b.ShardTransitions[ii].SizeSSZ()
+	}
+
 	return
 }
 
@@ -715,17 +1071,11 @@ func (p *ProposerSlashing) MarshalSSZTo(dst []byte) ([]byte, error) {
 	var err error
 
 	// Field (0) 'Header_1'
-	if p.Header_1 == nil {
-		p.Header_1 = new(SignedBeaconBlockHeader)
-	}
 	if dst, err = p.Header_1.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
 
 	// Field (1) 'Header_2'
-	if p.Header_2 == nil {
-		p.Header_2 = new(SignedBeaconBlockHeader)
-	}
 	if dst, err = p.Header_2.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
@@ -779,16 +1129,10 @@ func (a *AttesterSlashing) MarshalSSZTo(dst []byte) ([]byte, error) {
 
 	// Offset (0) 'Attestation_1'
 	dst = ssz.WriteOffset(dst, offset)
-	if a.Attestation_1 == nil {
-		a.Attestation_1 = new(IndexedAttestation)
-	}
 	offset += a.Attestation_1.SizeSSZ()
 
 	// Offset (1) 'Attestation_2'
 	dst = ssz.WriteOffset(dst, offset)
-	if a.Attestation_2 == nil {
-		a.Attestation_2 = new(IndexedAttestation)
-	}
 	offset += a.Attestation_2.SizeSSZ()
 
 	// Field (0) 'Attestation_1'
@@ -854,15 +1198,9 @@ func (a *AttesterSlashing) SizeSSZ() (size int) {
 	size = 8
 
 	// Field (0) 'Attestation_1'
-	if a.Attestation_1 == nil {
-		a.Attestation_1 = new(IndexedAttestation)
-	}
 	size += a.Attestation_1.SizeSSZ()
 
 	// Field (1) 'Attestation_2'
-	if a.Attestation_2 == nil {
-		a.Attestation_2 = new(IndexedAttestation)
-	}
 	size += a.Attestation_2.SizeSSZ()
 
 	return
@@ -889,9 +1227,6 @@ func (d *Deposit) MarshalSSZTo(dst []byte) ([]byte, error) {
 	}
 
 	// Field (1) 'Data'
-	if d.Data == nil {
-		d.Data = new(Deposit_Data)
-	}
 	if dst, err = d.Data.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
@@ -1043,9 +1378,6 @@ func (s *SignedVoluntaryExit) MarshalSSZTo(dst []byte) ([]byte, error) {
 	var err error
 
 	// Field (0) 'Exit'
-	if s.Exit == nil {
-		s.Exit = new(VoluntaryExit)
-	}
 	if dst, err = s.Exit.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
@@ -1215,9 +1547,6 @@ func (s *SignedBeaconBlockHeader) MarshalSSZTo(dst []byte) ([]byte, error) {
 	var err error
 
 	// Field (0) 'Header'
-	if s.Header == nil {
-		s.Header = new(BeaconBlockHeader)
-	}
 	if dst, err = s.Header.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
@@ -1267,16 +1596,13 @@ func (i *IndexedAttestation) MarshalSSZ() ([]byte, error) {
 // MarshalSSZTo ssz marshals the IndexedAttestation object to a target array
 func (i *IndexedAttestation) MarshalSSZTo(dst []byte) ([]byte, error) {
 	var err error
-	offset := int(228)
+	offset := int(292)
 
 	// Offset (0) 'AttestingIndices'
 	dst = ssz.WriteOffset(dst, offset)
 	offset += len(i.AttestingIndices) * 8
 
 	// Field (1) 'Data'
-	if i.Data == nil {
-		i.Data = new(AttestationData)
-	}
 	if dst, err = i.Data.MarshalSSZTo(dst); err != nil {
 		return nil, err
 	}
@@ -1301,7 +1627,7 @@ func (i *IndexedAttestation) MarshalSSZTo(dst []byte) ([]byte, error) {
 func (i *IndexedAttestation) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size < 228 {
+	if size < 292 {
 		return errSize
 	}
 
@@ -1317,12 +1643,12 @@ func (i *IndexedAttestation) UnmarshalSSZ(buf []byte) error {
 	if i.Data == nil {
 		i.Data = new(AttestationData)
 	}
-	if err = i.Data.UnmarshalSSZ(buf[4:132]); err != nil {
+	if err = i.Data.UnmarshalSSZ(buf[4:196]); err != nil {
 		return err
 	}
 
 	// Field (2) 'Signature'
-	i.Signature = append(i.Signature, buf[132:228]...)
+	i.Signature = append(i.Signature, buf[196:292]...)
 
 	// Field (0) 'AttestingIndices'
 	{
@@ -1344,92 +1670,10 @@ func (i *IndexedAttestation) UnmarshalSSZ(buf []byte) error {
 
 // SizeSSZ returns the ssz encoded size in bytes for the IndexedAttestation object
 func (i *IndexedAttestation) SizeSSZ() (size int) {
-	size = 228
+	size = 292
 
 	// Field (0) 'AttestingIndices'
 	size += len(i.AttestingIndices) * 8
 
-	return
-}
-
-// MarshalSSZ ssz marshals the Validator object
-func (v *Validator) MarshalSSZ() ([]byte, error) {
-	buf := make([]byte, v.SizeSSZ())
-	return v.MarshalSSZTo(buf[:0])
-}
-
-// MarshalSSZTo ssz marshals the Validator object to a target array
-func (v *Validator) MarshalSSZTo(dst []byte) ([]byte, error) {
-	var err error
-
-	// Field (0) 'PublicKey'
-	if dst, err = ssz.MarshalFixedBytes(dst, v.PublicKey, 48); err != nil {
-		return nil, errMarshalFixedBytes
-	}
-
-	// Field (1) 'WithdrawalCredentials'
-	if dst, err = ssz.MarshalFixedBytes(dst, v.WithdrawalCredentials, 32); err != nil {
-		return nil, errMarshalFixedBytes
-	}
-
-	// Field (2) 'EffectiveBalance'
-	dst = ssz.MarshalUint64(dst, v.EffectiveBalance)
-
-	// Field (3) 'Slashed'
-	dst = ssz.MarshalBool(dst, v.Slashed)
-
-	// Field (4) 'ActivationEligibilityEpoch'
-	dst = ssz.MarshalUint64(dst, v.ActivationEligibilityEpoch)
-
-	// Field (5) 'ActivationEpoch'
-	dst = ssz.MarshalUint64(dst, v.ActivationEpoch)
-
-	// Field (6) 'ExitEpoch'
-	dst = ssz.MarshalUint64(dst, v.ExitEpoch)
-
-	// Field (7) 'WithdrawableEpoch'
-	dst = ssz.MarshalUint64(dst, v.WithdrawableEpoch)
-
-	return dst, err
-}
-
-// UnmarshalSSZ ssz unmarshals the Validator object
-func (v *Validator) UnmarshalSSZ(buf []byte) error {
-	var err error
-	size := uint64(len(buf))
-	if size != 121 {
-		return errSize
-	}
-
-	// Field (0) 'PublicKey'
-	v.PublicKey = append(v.PublicKey, buf[0:48]...)
-
-	// Field (1) 'WithdrawalCredentials'
-	v.WithdrawalCredentials = append(v.WithdrawalCredentials, buf[48:80]...)
-
-	// Field (2) 'EffectiveBalance'
-	v.EffectiveBalance = ssz.UnmarshallUint64(buf[80:88])
-
-	// Field (3) 'Slashed'
-	v.Slashed = ssz.UnmarshalBool(buf[88:89])
-
-	// Field (4) 'ActivationEligibilityEpoch'
-	v.ActivationEligibilityEpoch = ssz.UnmarshallUint64(buf[89:97])
-
-	// Field (5) 'ActivationEpoch'
-	v.ActivationEpoch = ssz.UnmarshallUint64(buf[97:105])
-
-	// Field (6) 'ExitEpoch'
-	v.ExitEpoch = ssz.UnmarshallUint64(buf[105:113])
-
-	// Field (7) 'WithdrawableEpoch'
-	v.WithdrawableEpoch = ssz.UnmarshallUint64(buf[113:121])
-
-	return err
-}
-
-// SizeSSZ returns the ssz encoded size in bytes for the Validator object
-func (v *Validator) SizeSSZ() (size int) {
-	size = 121
 	return
 }
