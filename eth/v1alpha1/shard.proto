@@ -24,8 +24,9 @@ message ShardBlock {
     bytes shard_parent_root = 1 [(gogoproto.moretags) = "ssz-size:\"32\""];
     bytes beacon_parent_root = 2 [(gogoproto.moretags) = "ssz-size:\"32\""];
     uint64 slot = 3;
-    uint64 proposer_index = 4;
-    repeated bytes body = 5;
+    uint64 shard = 4;
+    uint64 proposer_index = 5;
+    repeated bytes body = 6;
 }
 
 message SignedShardBlock {
@@ -37,8 +38,9 @@ message ShardBlockHeader {
     bytes shard_parent_root = 1 [(gogoproto.moretags) = "ssz-size:\"32\""];
     bytes beacon_parent_root = 2 [(gogoproto.moretags) = "ssz-size:\"32\""];
     uint64 slot = 3;
-    uint64 proposer_index = 4;
-    bytes body_root = 5 [(gogoproto.moretags) = "ssz-size:\"32\""];
+    uint64 shard = 4;
+    uint64 proposer_index = 5;
+    bytes body_root = 6 [(gogoproto.moretags) = "ssz-size:\"32\""];
 }
 
 message ShardState {
