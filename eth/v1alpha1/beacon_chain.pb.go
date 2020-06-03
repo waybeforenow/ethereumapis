@@ -12,8 +12,11 @@ import (
 	types "github.com/gogo/protobuf/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -25,7 +28,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type SetAction int32
 
@@ -77,7 +80,7 @@ func (m *ValidatorChangeSet) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_ValidatorChangeSet.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +139,7 @@ func (m *ListIndexedAttestationsRequest) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_ListIndexedAttestationsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -162,10 +165,10 @@ type isListIndexedAttestationsRequest_QueryFilter interface {
 }
 
 type ListIndexedAttestationsRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type ListIndexedAttestationsRequest_GenesisEpoch struct {
-	GenesisEpoch bool `protobuf:"varint,2,opt,name=genesis_epoch,json=genesisEpoch,proto3,oneof"`
+	GenesisEpoch bool `protobuf:"varint,2,opt,name=genesis_epoch,json=genesisEpoch,proto3,oneof" json:"genesis_epoch,omitempty"`
 }
 
 func (*ListIndexedAttestationsRequest_Epoch) isListIndexedAttestationsRequest_QueryFilter()        {}
@@ -206,72 +209,12 @@ func (m *ListIndexedAttestationsRequest) GetPageToken() string {
 	return ""
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListIndexedAttestationsRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListIndexedAttestationsRequest_OneofMarshaler, _ListIndexedAttestationsRequest_OneofUnmarshaler, _ListIndexedAttestationsRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListIndexedAttestationsRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListIndexedAttestationsRequest_Epoch)(nil),
 		(*ListIndexedAttestationsRequest_GenesisEpoch)(nil),
 	}
-}
-
-func _ListIndexedAttestationsRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListIndexedAttestationsRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListIndexedAttestationsRequest_Epoch:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *ListIndexedAttestationsRequest_GenesisEpoch:
-		t := uint64(0)
-		if x.GenesisEpoch {
-			t = 1
-		}
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("ListIndexedAttestationsRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListIndexedAttestationsRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListIndexedAttestationsRequest)
-	switch tag {
-	case 1: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListIndexedAttestationsRequest_Epoch{x}
-		return true, err
-	case 2: // query_filter.genesis_epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListIndexedAttestationsRequest_GenesisEpoch{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListIndexedAttestationsRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListIndexedAttestationsRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListIndexedAttestationsRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *ListIndexedAttestationsRequest_GenesisEpoch:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ListAttestationsRequest struct {
@@ -300,7 +243,7 @@ func (m *ListAttestationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_ListAttestationsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -326,10 +269,10 @@ type isListAttestationsRequest_QueryFilter interface {
 }
 
 type ListAttestationsRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type ListAttestationsRequest_GenesisEpoch struct {
-	GenesisEpoch bool `protobuf:"varint,2,opt,name=genesis_epoch,json=genesisEpoch,proto3,oneof"`
+	GenesisEpoch bool `protobuf:"varint,2,opt,name=genesis_epoch,json=genesisEpoch,proto3,oneof" json:"genesis_epoch,omitempty"`
 }
 
 func (*ListAttestationsRequest_Epoch) isListAttestationsRequest_QueryFilter()        {}
@@ -370,72 +313,12 @@ func (m *ListAttestationsRequest) GetPageToken() string {
 	return ""
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListAttestationsRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListAttestationsRequest_OneofMarshaler, _ListAttestationsRequest_OneofUnmarshaler, _ListAttestationsRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListAttestationsRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListAttestationsRequest_Epoch)(nil),
 		(*ListAttestationsRequest_GenesisEpoch)(nil),
 	}
-}
-
-func _ListAttestationsRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListAttestationsRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListAttestationsRequest_Epoch:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *ListAttestationsRequest_GenesisEpoch:
-		t := uint64(0)
-		if x.GenesisEpoch {
-			t = 1
-		}
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("ListAttestationsRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListAttestationsRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListAttestationsRequest)
-	switch tag {
-	case 1: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListAttestationsRequest_Epoch{x}
-		return true, err
-	case 2: // query_filter.genesis_epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListAttestationsRequest_GenesisEpoch{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListAttestationsRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListAttestationsRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListAttestationsRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *ListAttestationsRequest_GenesisEpoch:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ListAttestationsResponse struct {
@@ -461,7 +344,7 @@ func (m *ListAttestationsResponse) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_ListAttestationsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -524,7 +407,7 @@ func (m *ListIndexedAttestationsResponse) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_ListIndexedAttestationsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -592,7 +475,7 @@ func (m *ListBlocksRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_ListBlocksRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -618,16 +501,16 @@ type isListBlocksRequest_QueryFilter interface {
 }
 
 type ListBlocksRequest_Root struct {
-	Root []byte `protobuf:"bytes,1,opt,name=root,proto3,oneof"`
+	Root []byte `protobuf:"bytes,1,opt,name=root,proto3,oneof" json:"root,omitempty"`
 }
 type ListBlocksRequest_Slot struct {
-	Slot uint64 `protobuf:"varint,2,opt,name=slot,proto3,oneof"`
+	Slot uint64 `protobuf:"varint,2,opt,name=slot,proto3,oneof" json:"slot,omitempty"`
 }
 type ListBlocksRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,3,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,3,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type ListBlocksRequest_Genesis struct {
-	Genesis bool `protobuf:"varint,4,opt,name=genesis,proto3,oneof"`
+	Genesis bool `protobuf:"varint,4,opt,name=genesis,proto3,oneof" json:"genesis,omitempty"`
 }
 
 func (*ListBlocksRequest_Root) isListBlocksRequest_QueryFilter()    {}
@@ -684,101 +567,14 @@ func (m *ListBlocksRequest) GetPageToken() string {
 	return ""
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListBlocksRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListBlocksRequest_OneofMarshaler, _ListBlocksRequest_OneofUnmarshaler, _ListBlocksRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListBlocksRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListBlocksRequest_Root)(nil),
 		(*ListBlocksRequest_Slot)(nil),
 		(*ListBlocksRequest_Epoch)(nil),
 		(*ListBlocksRequest_Genesis)(nil),
 	}
-}
-
-func _ListBlocksRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListBlocksRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListBlocksRequest_Root:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		_ = b.EncodeRawBytes(x.Root)
-	case *ListBlocksRequest_Slot:
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Slot))
-	case *ListBlocksRequest_Epoch:
-		_ = b.EncodeVarint(3<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *ListBlocksRequest_Genesis:
-		t := uint64(0)
-		if x.Genesis {
-			t = 1
-		}
-		_ = b.EncodeVarint(4<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("ListBlocksRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListBlocksRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListBlocksRequest)
-	switch tag {
-	case 1: // query_filter.root
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.QueryFilter = &ListBlocksRequest_Root{x}
-		return true, err
-	case 2: // query_filter.slot
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListBlocksRequest_Slot{x}
-		return true, err
-	case 3: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListBlocksRequest_Epoch{x}
-		return true, err
-	case 4: // query_filter.genesis
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListBlocksRequest_Genesis{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListBlocksRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListBlocksRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListBlocksRequest_Root:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(len(x.Root)))
-		n += len(x.Root)
-	case *ListBlocksRequest_Slot:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Slot))
-	case *ListBlocksRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *ListBlocksRequest_Genesis:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ListBlocksResponse struct {
@@ -804,7 +600,7 @@ func (m *ListBlocksResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return xxx_messageInfo_ListBlocksResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -866,7 +662,7 @@ func (m *BeaconBlockContainer) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_BeaconBlockContainer.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -931,7 +727,7 @@ func (m *ChainHead) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_ChainHead.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1058,7 +854,7 @@ func (m *ListCommitteesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_ListCommitteesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1084,10 +880,10 @@ type isListCommitteesRequest_QueryFilter interface {
 }
 
 type ListCommitteesRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type ListCommitteesRequest_Genesis struct {
-	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof"`
+	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof" json:"genesis,omitempty"`
 }
 
 func (*ListCommitteesRequest_Epoch) isListCommitteesRequest_QueryFilter()   {}
@@ -1114,72 +910,12 @@ func (m *ListCommitteesRequest) GetGenesis() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListCommitteesRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListCommitteesRequest_OneofMarshaler, _ListCommitteesRequest_OneofUnmarshaler, _ListCommitteesRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListCommitteesRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListCommitteesRequest_Epoch)(nil),
 		(*ListCommitteesRequest_Genesis)(nil),
 	}
-}
-
-func _ListCommitteesRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListCommitteesRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListCommitteesRequest_Epoch:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *ListCommitteesRequest_Genesis:
-		t := uint64(0)
-		if x.Genesis {
-			t = 1
-		}
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("ListCommitteesRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListCommitteesRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListCommitteesRequest)
-	switch tag {
-	case 1: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListCommitteesRequest_Epoch{x}
-		return true, err
-	case 2: // query_filter.genesis
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListCommitteesRequest_Genesis{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListCommitteesRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListCommitteesRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListCommitteesRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *ListCommitteesRequest_Genesis:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type BeaconCommittees struct {
@@ -1205,7 +941,7 @@ func (m *BeaconCommittees) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_BeaconCommittees.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1266,7 +1002,7 @@ func (m *BeaconCommittees_CommitteeItem) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_BeaconCommittees_CommitteeItem.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1313,7 +1049,7 @@ func (m *BeaconCommittees_CommitteesList) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_BeaconCommittees_CommitteesList.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1367,7 +1103,7 @@ func (m *ListValidatorBalancesRequest) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_ListValidatorBalancesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1393,10 +1129,10 @@ type isListValidatorBalancesRequest_QueryFilter interface {
 }
 
 type ListValidatorBalancesRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type ListValidatorBalancesRequest_Genesis struct {
-	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof"`
+	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof" json:"genesis,omitempty"`
 }
 
 func (*ListValidatorBalancesRequest_Epoch) isListValidatorBalancesRequest_QueryFilter()   {}
@@ -1451,72 +1187,12 @@ func (m *ListValidatorBalancesRequest) GetPageToken() string {
 	return ""
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListValidatorBalancesRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListValidatorBalancesRequest_OneofMarshaler, _ListValidatorBalancesRequest_OneofUnmarshaler, _ListValidatorBalancesRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListValidatorBalancesRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListValidatorBalancesRequest_Epoch)(nil),
 		(*ListValidatorBalancesRequest_Genesis)(nil),
 	}
-}
-
-func _ListValidatorBalancesRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListValidatorBalancesRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListValidatorBalancesRequest_Epoch:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *ListValidatorBalancesRequest_Genesis:
-		t := uint64(0)
-		if x.Genesis {
-			t = 1
-		}
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("ListValidatorBalancesRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListValidatorBalancesRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListValidatorBalancesRequest)
-	switch tag {
-	case 1: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListValidatorBalancesRequest_Epoch{x}
-		return true, err
-	case 2: // query_filter.genesis
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListValidatorBalancesRequest_Genesis{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListValidatorBalancesRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListValidatorBalancesRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListValidatorBalancesRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *ListValidatorBalancesRequest_Genesis:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ValidatorBalances struct {
@@ -1543,7 +1219,7 @@ func (m *ValidatorBalances) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_ValidatorBalances.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1613,7 +1289,7 @@ func (m *ValidatorBalances_Balance) XXX_Marshal(b []byte, deterministic bool) ([
 		return xxx_messageInfo_ValidatorBalances_Balance.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1682,7 +1358,7 @@ func (m *ListValidatorsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return xxx_messageInfo_ListValidatorsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1708,10 +1384,10 @@ type isListValidatorsRequest_QueryFilter interface {
 }
 
 type ListValidatorsRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type ListValidatorsRequest_Genesis struct {
-	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof"`
+	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof" json:"genesis,omitempty"`
 }
 
 func (*ListValidatorsRequest_Epoch) isListValidatorsRequest_QueryFilter()   {}
@@ -1773,72 +1449,12 @@ func (m *ListValidatorsRequest) GetIndices() []uint64 {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListValidatorsRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListValidatorsRequest_OneofMarshaler, _ListValidatorsRequest_OneofUnmarshaler, _ListValidatorsRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListValidatorsRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListValidatorsRequest_Epoch)(nil),
 		(*ListValidatorsRequest_Genesis)(nil),
 	}
-}
-
-func _ListValidatorsRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListValidatorsRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListValidatorsRequest_Epoch:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *ListValidatorsRequest_Genesis:
-		t := uint64(0)
-		if x.Genesis {
-			t = 1
-		}
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("ListValidatorsRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListValidatorsRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListValidatorsRequest)
-	switch tag {
-	case 1: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListValidatorsRequest_Epoch{x}
-		return true, err
-	case 2: // query_filter.genesis
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListValidatorsRequest_Genesis{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListValidatorsRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListValidatorsRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListValidatorsRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *ListValidatorsRequest_Genesis:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type GetValidatorRequest struct {
@@ -1865,7 +1481,7 @@ func (m *GetValidatorRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return xxx_messageInfo_GetValidatorRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1891,10 +1507,10 @@ type isGetValidatorRequest_QueryFilter interface {
 }
 
 type GetValidatorRequest_Index struct {
-	Index uint64 `protobuf:"varint,1,opt,name=index,proto3,oneof"`
+	Index uint64 `protobuf:"varint,1,opt,name=index,proto3,oneof" json:"index,omitempty"`
 }
 type GetValidatorRequest_PublicKey struct {
-	PublicKey []byte `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3,oneof"`
+	PublicKey []byte `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3,oneof" json:"public_key,omitempty" ssz-size:"48"`
 }
 
 func (*GetValidatorRequest_Index) isGetValidatorRequest_QueryFilter()     {}
@@ -1921,69 +1537,12 @@ func (m *GetValidatorRequest) GetPublicKey() []byte {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*GetValidatorRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _GetValidatorRequest_OneofMarshaler, _GetValidatorRequest_OneofUnmarshaler, _GetValidatorRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*GetValidatorRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*GetValidatorRequest_Index)(nil),
 		(*GetValidatorRequest_PublicKey)(nil),
 	}
-}
-
-func _GetValidatorRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*GetValidatorRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *GetValidatorRequest_Index:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Index))
-	case *GetValidatorRequest_PublicKey:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		_ = b.EncodeRawBytes(x.PublicKey)
-	case nil:
-	default:
-		return fmt.Errorf("GetValidatorRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _GetValidatorRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*GetValidatorRequest)
-	switch tag {
-	case 1: // query_filter.index
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &GetValidatorRequest_Index{x}
-		return true, err
-	case 2: // query_filter.public_key
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.QueryFilter = &GetValidatorRequest_PublicKey{x}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _GetValidatorRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*GetValidatorRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *GetValidatorRequest_Index:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Index))
-	case *GetValidatorRequest_PublicKey:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(len(x.PublicKey)))
-		n += len(x.PublicKey)
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type Validators struct {
@@ -2010,7 +1569,7 @@ func (m *Validators) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_Validators.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2079,7 +1638,7 @@ func (m *Validators_ValidatorContainer) XXX_Marshal(b []byte, deterministic bool
 		return xxx_messageInfo_Validators_ValidatorContainer.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2136,7 +1695,7 @@ func (m *GetValidatorActiveSetChangesRequest) XXX_Marshal(b []byte, deterministi
 		return xxx_messageInfo_GetValidatorActiveSetChangesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2162,10 +1721,10 @@ type isGetValidatorActiveSetChangesRequest_QueryFilter interface {
 }
 
 type GetValidatorActiveSetChangesRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type GetValidatorActiveSetChangesRequest_Genesis struct {
-	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof"`
+	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof" json:"genesis,omitempty"`
 }
 
 func (*GetValidatorActiveSetChangesRequest_Epoch) isGetValidatorActiveSetChangesRequest_QueryFilter() {
@@ -2194,72 +1753,12 @@ func (m *GetValidatorActiveSetChangesRequest) GetGenesis() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*GetValidatorActiveSetChangesRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _GetValidatorActiveSetChangesRequest_OneofMarshaler, _GetValidatorActiveSetChangesRequest_OneofUnmarshaler, _GetValidatorActiveSetChangesRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*GetValidatorActiveSetChangesRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*GetValidatorActiveSetChangesRequest_Epoch)(nil),
 		(*GetValidatorActiveSetChangesRequest_Genesis)(nil),
 	}
-}
-
-func _GetValidatorActiveSetChangesRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*GetValidatorActiveSetChangesRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *GetValidatorActiveSetChangesRequest_Epoch:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *GetValidatorActiveSetChangesRequest_Genesis:
-		t := uint64(0)
-		if x.Genesis {
-			t = 1
-		}
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("GetValidatorActiveSetChangesRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _GetValidatorActiveSetChangesRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*GetValidatorActiveSetChangesRequest)
-	switch tag {
-	case 1: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &GetValidatorActiveSetChangesRequest_Epoch{x}
-		return true, err
-	case 2: // query_filter.genesis
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &GetValidatorActiveSetChangesRequest_Genesis{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _GetValidatorActiveSetChangesRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*GetValidatorActiveSetChangesRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *GetValidatorActiveSetChangesRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *GetValidatorActiveSetChangesRequest_Genesis:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ActiveSetChanges struct {
@@ -2291,7 +1790,7 @@ func (m *ActiveSetChanges) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_ActiveSetChanges.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2374,7 +1873,8 @@ func (m *ActiveSetChanges) GetEjectedIndices() []uint64 {
 }
 
 type ValidatorPerformanceRequest struct {
-	PublicKeys           [][]byte `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty"`
+	PublicKeys           [][]byte `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty"` // Deprecated: Do not use.
+	Indices              []uint64 `protobuf:"varint,2,rep,packed,name=indices,proto3" json:"indices,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -2394,7 +1894,7 @@ func (m *ValidatorPerformanceRequest) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_ValidatorPerformanceRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2413,9 +1913,17 @@ func (m *ValidatorPerformanceRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ValidatorPerformanceRequest proto.InternalMessageInfo
 
+// Deprecated: Do not use.
 func (m *ValidatorPerformanceRequest) GetPublicKeys() [][]byte {
 	if m != nil {
 		return m.PublicKeys
+	}
+	return nil
+}
+
+func (m *ValidatorPerformanceRequest) GetIndices() []uint64 {
+	if m != nil {
+		return m.Indices
 	}
 	return nil
 }
@@ -2450,7 +1958,7 @@ func (m *ValidatorPerformanceResponse) XXX_Marshal(b []byte, deterministic bool)
 		return xxx_messageInfo_ValidatorPerformanceResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2564,7 +2072,7 @@ func (m *ValidatorQueue) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return xxx_messageInfo_ValidatorQueue.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2648,7 +2156,7 @@ func (m *ListValidatorAssignmentsRequest) XXX_Marshal(b []byte, deterministic bo
 		return xxx_messageInfo_ListValidatorAssignmentsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2674,10 +2182,10 @@ type isListValidatorAssignmentsRequest_QueryFilter interface {
 }
 
 type ListValidatorAssignmentsRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type ListValidatorAssignmentsRequest_Genesis struct {
-	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof"`
+	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof" json:"genesis,omitempty"`
 }
 
 func (*ListValidatorAssignmentsRequest_Epoch) isListValidatorAssignmentsRequest_QueryFilter()   {}
@@ -2732,72 +2240,12 @@ func (m *ListValidatorAssignmentsRequest) GetPageToken() string {
 	return ""
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*ListValidatorAssignmentsRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _ListValidatorAssignmentsRequest_OneofMarshaler, _ListValidatorAssignmentsRequest_OneofUnmarshaler, _ListValidatorAssignmentsRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListValidatorAssignmentsRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*ListValidatorAssignmentsRequest_Epoch)(nil),
 		(*ListValidatorAssignmentsRequest_Genesis)(nil),
 	}
-}
-
-func _ListValidatorAssignmentsRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*ListValidatorAssignmentsRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListValidatorAssignmentsRequest_Epoch:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *ListValidatorAssignmentsRequest_Genesis:
-		t := uint64(0)
-		if x.Genesis {
-			t = 1
-		}
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("ListValidatorAssignmentsRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _ListValidatorAssignmentsRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*ListValidatorAssignmentsRequest)
-	switch tag {
-	case 1: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListValidatorAssignmentsRequest_Epoch{x}
-		return true, err
-	case 2: // query_filter.genesis
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &ListValidatorAssignmentsRequest_Genesis{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _ListValidatorAssignmentsRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*ListValidatorAssignmentsRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *ListValidatorAssignmentsRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *ListValidatorAssignmentsRequest_Genesis:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ValidatorAssignments struct {
@@ -2824,7 +2272,7 @@ func (m *ValidatorAssignments) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_ValidatorAssignments.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2899,7 +2347,7 @@ func (m *ValidatorAssignments_CommitteeAssignment) XXX_Marshal(b []byte, determi
 		return xxx_messageInfo_ValidatorAssignments_CommitteeAssignment.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -2985,7 +2433,7 @@ func (m *GetValidatorParticipationRequest) XXX_Marshal(b []byte, deterministic b
 		return xxx_messageInfo_GetValidatorParticipationRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3011,10 +2459,10 @@ type isGetValidatorParticipationRequest_QueryFilter interface {
 }
 
 type GetValidatorParticipationRequest_Epoch struct {
-	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof"`
+	Epoch uint64 `protobuf:"varint,1,opt,name=epoch,proto3,oneof" json:"epoch,omitempty"`
 }
 type GetValidatorParticipationRequest_Genesis struct {
-	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof"`
+	Genesis bool `protobuf:"varint,2,opt,name=genesis,proto3,oneof" json:"genesis,omitempty"`
 }
 
 func (*GetValidatorParticipationRequest_Epoch) isGetValidatorParticipationRequest_QueryFilter()   {}
@@ -3041,72 +2489,12 @@ func (m *GetValidatorParticipationRequest) GetGenesis() bool {
 	return false
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*GetValidatorParticipationRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _GetValidatorParticipationRequest_OneofMarshaler, _GetValidatorParticipationRequest_OneofUnmarshaler, _GetValidatorParticipationRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*GetValidatorParticipationRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*GetValidatorParticipationRequest_Epoch)(nil),
 		(*GetValidatorParticipationRequest_Genesis)(nil),
 	}
-}
-
-func _GetValidatorParticipationRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*GetValidatorParticipationRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *GetValidatorParticipationRequest_Epoch:
-		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.Epoch))
-	case *GetValidatorParticipationRequest_Genesis:
-		t := uint64(0)
-		if x.Genesis {
-			t = 1
-		}
-		_ = b.EncodeVarint(2<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case nil:
-	default:
-		return fmt.Errorf("GetValidatorParticipationRequest.QueryFilter has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _GetValidatorParticipationRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*GetValidatorParticipationRequest)
-	switch tag {
-	case 1: // query_filter.epoch
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &GetValidatorParticipationRequest_Epoch{x}
-		return true, err
-	case 2: // query_filter.genesis
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.QueryFilter = &GetValidatorParticipationRequest_Genesis{x != 0}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _GetValidatorParticipationRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*GetValidatorParticipationRequest)
-	// query_filter
-	switch x := m.QueryFilter.(type) {
-	case *GetValidatorParticipationRequest_Epoch:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Epoch))
-	case *GetValidatorParticipationRequest_Genesis:
-		n += 1 // tag and wire
-		n += 1
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type ValidatorParticipationResponse struct {
@@ -3132,7 +2520,7 @@ func (m *ValidatorParticipationResponse) XXX_Marshal(b []byte, deterministic boo
 		return xxx_messageInfo_ValidatorParticipationResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3194,7 +2582,7 @@ func (m *AttestationPoolRequest) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_AttestationPoolRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3250,7 +2638,7 @@ func (m *AttestationPoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return xxx_messageInfo_AttestationPoolResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3311,7 +2699,7 @@ func (m *BeaconConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_BeaconConfig.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3358,7 +2746,7 @@ func (m *SubmitSlashingResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return xxx_messageInfo_SubmitSlashingResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -3427,187 +2815,187 @@ func init() {
 func init() { proto.RegisterFile("eth/v1alpha1/beacon_chain.proto", fileDescriptor_e33ad64d6ced77c1) }
 
 var fileDescriptor_e33ad64d6ced77c1 = []byte{
-	// 2866 bytes of a gzipped FileDescriptorProto
+	// 2874 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x5a, 0x5f, 0x6f, 0x1c, 0x57,
-	0x15, 0xcf, 0xac, 0xd7, 0x8e, 0xf7, 0x78, 0xbd, 0x6b, 0x5f, 0xaf, 0x1d, 0x67, 0xe2, 0xd8, 0xdb,
-	0x49, 0x13, 0x3b, 0x49, 0xbd, 0xeb, 0x3a, 0x69, 0x9a, 0x96, 0xaa, 0xc5, 0x4e, 0x8c, 0x13, 0x1a,
-	0x54, 0x33, 0x76, 0x83, 0xa0, 0x95, 0x56, 0xb3, 0xeb, 0xbb, 0xbb, 0xd3, 0xec, 0xce, 0x6c, 0x66,
+	0x15, 0xcf, 0xac, 0xd7, 0x8e, 0xf7, 0x78, 0xbd, 0x6b, 0x5f, 0xaf, 0x9d, 0xcd, 0xc4, 0xb1, 0xb7,
+	0x93, 0x26, 0x76, 0x92, 0x7a, 0xd7, 0x75, 0xd2, 0x34, 0x2d, 0x55, 0x8b, 0x9d, 0x18, 0x27, 0x34,
+	0xa8, 0x66, 0xec, 0x06, 0x41, 0x23, 0xad, 0xc6, 0xeb, 0xbb, 0xbb, 0xd3, 0xec, 0xce, 0x6c, 0x66,
 	0xee, 0x5a, 0x71, 0x04, 0x3c, 0x00, 0xe2, 0x03, 0x00, 0xe2, 0x81, 0x07, 0x04, 0x82, 0x87, 0x96,
 	0x0a, 0x09, 0xf5, 0x01, 0x1e, 0xfa, 0xc0, 0x1b, 0x42, 0x3c, 0x21, 0x21, 0xde, 0x50, 0x85, 0xaa,
-	0x3e, 0x21, 0x81, 0x44, 0xc5, 0x07, 0x40, 0xf7, 0xcf, 0xcc, 0xdc, 0xf9, 0xb7, 0xbb, 0x56, 0x8d,
+	0x3e, 0x21, 0x81, 0x44, 0xc5, 0x07, 0x40, 0xf7, 0xcf, 0xcc, 0xdc, 0xf9, 0xb7, 0xbb, 0x51, 0x8c,
 	0x54, 0xf1, 0xe4, 0x9d, 0x73, 0xcf, 0x3d, 0xe7, 0x77, 0xcf, 0x3d, 0xf7, 0xdc, 0x73, 0xce, 0x35,
-	0xac, 0x60, 0xd2, 0xae, 0x1e, 0x3d, 0x6f, 0x74, 0x7a, 0x6d, 0xe3, 0xf9, 0x6a, 0x1d, 0x1b, 0x0d,
-	0xdb, 0xaa, 0x35, 0xda, 0x86, 0x69, 0x55, 0x7a, 0x8e, 0x4d, 0x6c, 0x34, 0x8f, 0x49, 0x1b, 0x3b,
-	0xb8, 0xdf, 0xad, 0x60, 0xd2, 0xae, 0x78, 0x9c, 0xea, 0x7a, 0xcb, 0x24, 0xed, 0x7e, 0xbd, 0xd2,
-	0xb0, 0xbb, 0xd5, 0x96, 0xdd, 0xb2, 0xab, 0x8c, 0xbb, 0xde, 0x6f, 0xb2, 0x2f, 0xf6, 0xc1, 0x7e,
-	0x71, 0x29, 0xea, 0x52, 0xcb, 0xb6, 0x5b, 0x1d, 0x5c, 0x35, 0x7a, 0x66, 0xd5, 0xb0, 0x2c, 0x9b,
-	0x18, 0xc4, 0xb4, 0x2d, 0x57, 0x8c, 0x5e, 0x10, 0xa3, 0xbe, 0x0c, 0xdc, 0xed, 0x91, 0x63, 0x31,
-	0x78, 0x3e, 0x3a, 0x68, 0x58, 0xde, 0xd0, 0x72, 0x08, 0xbc, 0x41, 0x08, 0x76, 0xb9, 0x60, 0x31,
-	0x9e, 0xb8, 0xb8, 0x7a, 0xc7, 0x6e, 0x3c, 0xf2, 0x60, 0x85, 0x18, 0x8e, 0x8c, 0x8e, 0x79, 0x68,
-	0x10, 0xdb, 0xe1, 0xa3, 0x9a, 0x0d, 0xe8, 0xa1, 0x47, 0xba, 0xd3, 0x36, 0xac, 0x16, 0xde, 0xc7,
-	0x04, 0xdd, 0x86, 0x09, 0xa3, 0x41, 0x95, 0x2c, 0x2a, 0x65, 0x65, 0xad, 0xb0, 0x59, 0xae, 0x24,
-	0x5a, 0xa8, 0xb2, 0x8f, 0xc9, 0x16, 0xe3, 0xd3, 0x05, 0x3f, 0x5a, 0x81, 0xa9, 0x5e, 0xbf, 0xde,
-	0x31, 0x1b, 0xb5, 0x47, 0xf8, 0xd8, 0x5d, 0xcc, 0x94, 0xc7, 0xd6, 0xf2, 0x3a, 0x70, 0xd2, 0xeb,
-	0xf8, 0xd8, 0xd5, 0xde, 0x57, 0x60, 0xf9, 0x81, 0xe9, 0x92, 0xfb, 0xd6, 0x21, 0x7e, 0x82, 0x0f,
-	0xb7, 0x82, 0x05, 0xb9, 0x3a, 0x7e, 0xdc, 0xc7, 0x2e, 0x41, 0x0b, 0x30, 0x8e, 0x7b, 0x76, 0xa3,
-	0xcd, 0x94, 0x67, 0xef, 0x9d, 0xd1, 0xf9, 0x27, 0xba, 0x0c, 0xd3, 0x2d, 0x6c, 0x61, 0xd7, 0x74,
-	0x6b, 0x7c, 0x3c, 0x53, 0x56, 0xd6, 0x26, 0xef, 0x9d, 0xd1, 0xf3, 0x82, 0xbc, 0xc3, 0xd8, 0x2e,
-	0x40, 0xae, 0x67, 0xb4, 0x70, 0xcd, 0x35, 0x9f, 0xe2, 0xc5, 0xb1, 0xb2, 0xb2, 0x36, 0xae, 0x4f,
-	0x52, 0xc2, 0xbe, 0xf9, 0x14, 0xa3, 0x8b, 0x00, 0x6c, 0x90, 0xd8, 0x8f, 0xb0, 0xb5, 0x98, 0x2d,
-	0x2b, 0x6b, 0x39, 0x9d, 0xb1, 0x1f, 0x50, 0xc2, 0x76, 0x01, 0xf2, 0x8f, 0xfb, 0xd8, 0x39, 0xae,
-	0x35, 0xcd, 0x0e, 0xc1, 0x8e, 0xf6, 0x4b, 0x05, 0xce, 0x51, 0xb4, 0x9f, 0x73, 0x98, 0xef, 0x29,
-	0xb0, 0x18, 0x87, 0xe9, 0xf6, 0x6c, 0xcb, 0xc5, 0xe8, 0x4b, 0x90, 0x97, 0xdc, 0xc6, 0x5d, 0x54,
-	0xca, 0x63, 0x6b, 0x53, 0x9b, 0x5a, 0xca, 0x96, 0x4a, 0x22, 0xf4, 0xd0, 0x3c, 0x74, 0x05, 0x8a,
-	0x16, 0x7e, 0x42, 0x6a, 0x12, 0xb0, 0x0c, 0x03, 0x36, 0x4d, 0xc9, 0x7b, 0x1e, 0x38, 0x8a, 0x9d,
-	0xd8, 0xc4, 0xe8, 0xc8, 0x2b, 0xcb, 0x31, 0x0a, 0x5d, 0x9a, 0xf6, 0x07, 0x05, 0x56, 0x52, 0x1d,
-	0x40, 0x40, 0x7e, 0x1b, 0x4a, 0x26, 0x1f, 0xae, 0x25, 0x40, 0xbf, 0x9a, 0x02, 0x3d, 0x2e, 0x51,
-	0x9f, 0x33, 0xe3, 0x5a, 0x4e, 0x6b, 0x21, 0xbf, 0x57, 0x60, 0x96, 0x2e, 0x64, 0x9b, 0x1e, 0x36,
-	0xdf, 0x2b, 0x4a, 0x90, 0x75, 0x6c, 0x9b, 0x30, 0xa7, 0xc8, 0xdf, 0x3b, 0xa3, 0xb3, 0x2f, 0x4a,
-	0x75, 0x3b, 0x36, 0x61, 0x7a, 0xa8, 0xab, 0xb0, 0xaf, 0xc0, 0x83, 0xc6, 0xc2, 0x1e, 0xa4, 0xc2,
-	0x59, 0xe1, 0x2a, 0x6c, 0xeb, 0xa9, 0xef, 0x78, 0x84, 0xb0, 0xdb, 0x8c, 0x0f, 0x74, 0x9b, 0x89,
-	0x61, 0x6e, 0xf3, 0x81, 0x02, 0x48, 0x5e, 0x81, 0xb0, 0xfe, 0x9b, 0x50, 0x64, 0x01, 0xe4, 0x8e,
-	0x6d, 0x11, 0xc3, 0xb4, 0xb0, 0xe3, 0x19, 0xfe, 0x7a, 0x8a, 0xe1, 0xb7, 0x59, 0xd4, 0xd9, 0x0e,
-	0xcd, 0xd1, 0xa3, 0x32, 0x4e, 0xcb, 0xec, 0x7d, 0x28, 0x25, 0xe9, 0x43, 0xaf, 0xc2, 0x38, 0xd3,
-	0xc8, 0x2c, 0x3f, 0xb5, 0xb9, 0x96, 0x16, 0xb2, 0xcc, 0x96, 0x85, 0x0f, 0x25, 0x09, 0x3a, 0x9f,
-	0x46, 0xd5, 0xb2, 0x1f, 0x35, 0xb6, 0x7d, 0x14, 0x59, 0x5e, 0xcf, 0x31, 0x8a, 0x6e, 0xdb, 0x44,
-	0xfb, 0x4f, 0x16, 0x72, 0x77, 0xe8, 0x9d, 0x71, 0x0f, 0x1b, 0x87, 0x74, 0x17, 0xda, 0xd8, 0x38,
-	0xac, 0xb1, 0x4d, 0x65, 0xe7, 0x5f, 0x9f, 0xa4, 0x84, 0x7d, 0xba, 0xad, 0x17, 0x01, 0xd8, 0x60,
-	0x70, 0xfa, 0xb3, 0x3a, 0x63, 0xe7, 0x07, 0xff, 0x25, 0x28, 0xb2, 0x61, 0x49, 0x1b, 0x5d, 0x64,
-	0x7e, 0x7b, 0xf6, 0xd3, 0x8f, 0x56, 0xa6, 0x5d, 0xf7, 0xe9, 0x3a, 0x5d, 0xf8, 0xcb, 0xda, 0x8d,
-	0x4d, 0x4d, 0x9f, 0xa6, 0x9c, 0xdb, 0x1e, 0x08, 0x74, 0x19, 0x0a, 0x4d, 0xd3, 0x32, 0x3a, 0xe6,
-	0x53, 0x2c, 0x74, 0x67, 0x99, 0xf4, 0x69, 0x9f, 0xca, 0x00, 0xac, 0x42, 0x31, 0x60, 0xe3, 0x28,
-	0xc6, 0x19, 0x5f, 0x30, 0x9b, 0x43, 0xb9, 0x03, 0xa5, 0x80, 0x51, 0xc2, 0x33, 0x91, 0x86, 0x07,
-	0xf9, 0xec, 0x21, 0x50, 0xef, 0xf4, 0x5d, 0x62, 0x36, 0x4d, 0x0f, 0xd4, 0x59, 0x0e, 0xca, 0xa7,
-	0x7a, 0xa0, 0x02, 0x36, 0x0e, 0x6a, 0x92, 0x83, 0xf2, 0xc9, 0x3e, 0xa8, 0x80, 0x51, 0x02, 0x95,
-	0x4b, 0x05, 0xe5, 0xb3, 0x07, 0xa0, 0x6e, 0xc1, 0xb9, 0x9e, 0x83, 0x8f, 0x4c, 0xbb, 0xef, 0xd6,
-	0x22, 0xe8, 0x80, 0x69, 0x9d, 0xf7, 0x86, 0xbf, 0x1c, 0x42, 0x79, 0x1b, 0x16, 0x13, 0xe6, 0x71,
-	0xb8, 0x53, 0x6c, 0xe2, 0x42, 0x6c, 0x22, 0x87, 0x7d, 0x00, 0x17, 0x13, 0x66, 0x4a, 0xf8, 0xf3,
-	0x69, 0xf8, 0xd5, 0x98, 0x44, 0x7f, 0x1d, 0xda, 0x5b, 0x30, 0x4f, 0x4f, 0xe8, 0x1d, 0xbb, 0xdb,
-	0x35, 0x09, 0xc1, 0x78, 0xe8, 0xed, 0x23, 0xc5, 0x8e, 0x4c, 0x24, 0x76, 0xc4, 0xce, 0xff, 0x5f,
-	0xc7, 0x60, 0x86, 0x9f, 0x84, 0x40, 0x3e, 0x2a, 0x85, 0x04, 0x7b, 0x62, 0xbf, 0x06, 0xd0, 0xf0,
-	0x79, 0xd8, 0xb5, 0x3e, 0xb5, 0xf9, 0xe2, 0xc0, 0x70, 0x10, 0x88, 0xac, 0x04, 0x3f, 0x77, 0x2c,
-	0xe2, 0x1c, 0xeb, 0x92, 0x28, 0x74, 0x13, 0x16, 0x68, 0xea, 0x70, 0x84, 0x6b, 0x7e, 0x6a, 0x52,
-	0x6b, 0xd8, 0x7d, 0x8b, 0x1f, 0x8a, 0xac, 0x5e, 0xe2, 0xa3, 0x41, 0x92, 0x42, 0xc7, 0xd4, 0x57,
-	0x60, 0xda, 0x17, 0x7a, 0x9f, 0xe0, 0x2e, 0xba, 0x0e, 0xb3, 0xc1, 0x7c, 0xd3, 0x3a, 0x34, 0x1b,
-	0x98, 0x47, 0xad, 0xac, 0x3e, 0xe3, 0x0f, 0xdc, 0xe7, 0x74, 0xb5, 0x05, 0x85, 0x00, 0x12, 0x35,
-	0x2f, 0x7a, 0x33, 0xb4, 0x3c, 0x1e, 0xed, 0x5e, 0x38, 0xf1, 0xf2, 0x28, 0x12, 0x79, 0x71, 0x6a,
-	0x1f, 0x8a, 0x91, 0xb5, 0xa3, 0x19, 0x18, 0x7b, 0x84, 0x8f, 0x85, 0x71, 0xe9, 0x4f, 0xf4, 0x00,
-	0xc6, 0x8f, 0x8c, 0x4e, 0x1f, 0xb3, 0xfd, 0x9a, 0xda, 0xbc, 0x75, 0x72, 0xab, 0xd2, 0x25, 0xe8,
-	0x5c, 0xc8, 0xcb, 0x99, 0xdb, 0x8a, 0xf6, 0x2f, 0x05, 0x96, 0x28, 0xcd, 0x37, 0xda, 0xb6, 0xd1,
-	0x31, 0xac, 0xc6, 0x67, 0x72, 0x1e, 0x74, 0x33, 0x9c, 0xd9, 0x8d, 0xd1, 0xcc, 0x6e, 0x7b, 0xee,
-	0xd3, 0x8f, 0x56, 0x8a, 0x81, 0x37, 0xbf, 0xf6, 0xdc, 0xcd, 0xdb, 0x9a, 0x9c, 0xee, 0xa1, 0x45,
-	0x38, 0xeb, 0xed, 0x46, 0x96, 0xed, 0x86, 0xf7, 0x79, 0xaa, 0x17, 0xd9, 0xfb, 0x19, 0x98, 0x8d,
-	0x2d, 0x36, 0xc5, 0x93, 0x1f, 0xc0, 0x64, 0x5d, 0x70, 0x08, 0x3f, 0xde, 0x48, 0xb1, 0x78, 0x4c,
-	0x62, 0x45, 0xfc, 0xd0, 0x7d, 0x09, 0x49, 0x97, 0xda, 0xd8, 0xf0, 0x4b, 0x2d, 0x1b, 0xb9, 0xd4,
-	0xd4, 0x47, 0x70, 0x56, 0xc8, 0x46, 0x1b, 0x00, 0x81, 0x9d, 0x79, 0x1a, 0x11, 0x0d, 0x1a, 0xd4,
-	0xc8, 0x39, 0xdf, 0xc8, 0x74, 0x9d, 0x2c, 0xcd, 0x11, 0x57, 0x0d, 0xff, 0xa0, 0x96, 0x17, 0x28,
-	0xc5, 0x49, 0xf2, 0x3e, 0xb5, 0x7f, 0x28, 0x3c, 0xa8, 0xf8, 0xeb, 0xfb, 0x4c, 0x7e, 0xb1, 0xc0,
-	0x6b, 0x85, 0x23, 0xae, 0x66, 0x52, 0x17, 0x5f, 0xe1, 0xfd, 0xcd, 0x0e, 0xdc, 0xdf, 0xf1, 0xc8,
-	0xfe, 0x46, 0xab, 0x88, 0x89, 0x68, 0x15, 0x21, 0xbb, 0xd5, 0xd9, 0x90, 0x5b, 0xc5, 0x5c, 0xe3,
-	0x31, 0xcc, 0xed, 0xe2, 0x60, 0xa9, 0xd2, 0x4a, 0xb9, 0xcd, 0xfc, 0x95, 0x72, 0xab, 0x6d, 0x86,
-	0xac, 0x9f, 0x49, 0xb1, 0xfe, 0xbd, 0x33, 0x92, 0xfd, 0xe3, 0x69, 0x55, 0x06, 0x20, 0xb0, 0x6d,
-	0x8a, 0x1b, 0xbe, 0x05, 0x85, 0x20, 0x60, 0x75, 0x4c, 0x97, 0x08, 0x67, 0xbc, 0x39, 0xcc, 0x19,
-	0xdd, 0x8a, 0x14, 0x0b, 0xbd, 0x64, 0x6b, 0xda, 0x97, 0xc5, 0xc2, 0xd9, 0x29, 0x79, 0xe5, 0x3b,
-	0x72, 0x71, 0xe8, 0x27, 0x5a, 0xa5, 0x90, 0xe9, 0x3c, 0xc3, 0xbd, 0x0a, 0x39, 0x1f, 0x83, 0x88,
-	0x64, 0xe5, 0x61, 0x4b, 0xd1, 0x83, 0x29, 0x9a, 0x09, 0x97, 0xe4, 0x7d, 0xda, 0x62, 0x4e, 0xb4,
-	0x8f, 0x09, 0x2f, 0x4a, 0x4f, 0xf5, 0xda, 0xfb, 0x64, 0x0c, 0x66, 0xa2, 0xf2, 0x53, 0x76, 0x69,
-	0x17, 0xe6, 0x99, 0x3b, 0x1b, 0x04, 0x1f, 0xd6, 0x62, 0x85, 0x6d, 0x72, 0xf8, 0x9b, 0xf3, 0x67,
-	0xec, 0x05, 0x0e, 0x7b, 0x1d, 0x66, 0x03, 0x41, 0x9e, 0xeb, 0x8e, 0xf1, 0xfb, 0xc9, 0x1f, 0x10,
-	0xf7, 0x13, 0xda, 0x02, 0x84, 0x9f, 0x98, 0x51, 0x95, 0xd9, 0x74, 0x95, 0x33, 0x9c, 0x5d, 0xd2,
-	0x77, 0x19, 0x0a, 0x42, 0x84, 0xa7, 0x6c, 0x9c, 0x29, 0x9b, 0xe6, 0x54, 0x4f, 0xd3, 0x1d, 0x98,
-	0x73, 0x3b, 0x86, 0xdb, 0x8e, 0xa8, 0x9a, 0x48, 0x57, 0x35, 0x2b, 0xf8, 0x25, 0x5d, 0xab, 0x50,
-	0xf4, 0x84, 0x84, 0x0f, 0x65, 0x41, 0x90, 0x25, 0x6d, 0xf8, 0x1d, 0xdc, 0x88, 0x2e, 0x6c, 0x72,
-	0x80, 0x36, 0xc1, 0x1f, 0xd6, 0xe6, 0x09, 0xf1, 0xb4, 0xe5, 0xb8, 0x36, 0x41, 0x16, 0xda, 0xb4,
-	0x57, 0xe1, 0x82, 0xef, 0x4e, 0x7b, 0xd8, 0x69, 0xda, 0x4e, 0x97, 0x05, 0x6f, 0xe1, 0x49, 0x91,
-	0x18, 0xa3, 0xc4, 0x3a, 0x15, 0x7f, 0xcb, 0xc2, 0x52, 0xb2, 0x00, 0x51, 0x27, 0xbd, 0x02, 0x6a,
-	0xa3, 0xef, 0x38, 0xd8, 0x22, 0x35, 0xdc, 0x6c, 0x62, 0x9e, 0xc5, 0xf8, 0x77, 0x0b, 0x4f, 0x3e,
-	0x16, 0x05, 0xc7, 0x8e, 0xc7, 0xe0, 0xdf, 0x4e, 0xab, 0x50, 0x34, 0xad, 0x46, 0xa7, 0xef, 0x9a,
-	0xb6, 0xc5, 0x12, 0x53, 0xee, 0x54, 0x59, 0xbd, 0xe0, 0x93, 0x69, 0x46, 0xea, 0xa2, 0x2a, 0xcc,
-	0x05, 0x8c, 0x87, 0xa6, 0x4b, 0xb8, 0x7c, 0xee, 0x3c, 0xc8, 0x1f, 0xba, 0xeb, 0x8d, 0xd0, 0x94,
-	0xaa, 0x61, 0x3b, 0x0e, 0x6e, 0x90, 0xce, 0x71, 0xed, 0xc8, 0xa6, 0x96, 0x72, 0xed, 0xbe, 0xd3,
-	0xc0, 0xcc, 0x85, 0x26, 0xf5, 0x92, 0x3f, 0xfa, 0x90, 0x0e, 0xee, 0xb3, 0xb1, 0xa4, 0x59, 0xc4,
-	0x70, 0x5a, 0x98, 0x30, 0xcf, 0x89, 0xcd, 0x3a, 0x60, 0x63, 0x68, 0x03, 0x4a, 0xd1, 0x59, 0xb4,
-	0x64, 0x61, 0x1e, 0x34, 0xa9, 0xa3, 0xf0, 0x1c, 0x56, 0x3a, 0xed, 0x42, 0xd9, 0xb3, 0x51, 0xad,
-	0x8e, 0x9b, 0xb6, 0x83, 0x79, 0x7a, 0x5d, 0x23, 0x8e, 0x61, 0xb9, 0x26, 0xeb, 0x3a, 0x71, 0xf7,
-	0xb9, 0xe8, 0xf1, 0x6d, 0x33, 0x36, 0x96, 0x66, 0x1f, 0xf8, 0x4c, 0x68, 0x07, 0x56, 0x7c, 0x41,
-	0x46, 0x93, 0x60, 0x27, 0x2e, 0x67, 0x92, 0xc9, 0x59, 0xf2, 0xd8, 0xb6, 0x28, 0x57, 0x54, 0xcc,
-	0x3a, 0xa0, 0xae, 0xe9, 0xba, 0xa6, 0xd5, 0x0a, 0x32, 0x50, 0xee, 0x52, 0x79, 0x7d, 0x56, 0x8c,
-	0x48, 0xd1, 0x7c, 0x17, 0xca, 0xc6, 0x11, 0x76, 0x68, 0x60, 0x8d, 0xe5, 0xad, 0xde, 0x7d, 0x4b,
-	0x2b, 0x8c, 0x8c, 0x7e, 0x51, 0xf0, 0x6d, 0x85, 0x13, 0x58, 0xe1, 0x00, 0xda, 0xef, 0x32, 0x50,
-	0xf0, 0x89, 0x5f, 0xed, 0xe3, 0x3e, 0xa6, 0x2e, 0xd9, 0x68, 0xf7, 0x1d, 0xab, 0xd6, 0x31, 0xbb,
-	0xa6, 0x57, 0x57, 0x02, 0x23, 0x3d, 0xa0, 0x14, 0xf4, 0xba, 0x48, 0x96, 0x59, 0x23, 0x23, 0x21,
-	0x1e, 0xcd, 0x27, 0x9c, 0xa1, 0x45, 0x45, 0xe4, 0xd0, 0x6c, 0x92, 0x74, 0x90, 0x5e, 0x03, 0x16,
-	0x36, 0x6a, 0xf1, 0xac, 0x2e, 0x45, 0x0c, 0x8b, 0x28, 0x92, 0x80, 0x2f, 0xc2, 0x92, 0x84, 0x26,
-	0x9e, 0x7e, 0xf3, 0x84, 0x4f, 0x0d, 0x78, 0x1e, 0x46, 0x12, 0x71, 0xea, 0x73, 0x0c, 0x42, 0x7c,
-	0x2e, 0x8f, 0x56, 0x25, 0x3a, 0x1a, 0x9d, 0xa5, 0xfd, 0x5b, 0x74, 0x90, 0x82, 0xcb, 0xc2, 0x75,
-	0xcd, 0x96, 0xd5, 0xc5, 0x16, 0xf9, 0xbf, 0xcd, 0x70, 0xff, 0x39, 0x06, 0xa5, 0xa4, 0xf5, 0xa6,
-	0xdc, 0x5b, 0x06, 0x4c, 0x19, 0x01, 0x93, 0x48, 0x2d, 0x5e, 0x1b, 0x76, 0x1f, 0x4b, 0x72, 0x83,
-	0xea, 0x22, 0x20, 0xea, 0xb2, 0xcc, 0xd3, 0xca, 0x31, 0x7e, 0x94, 0x81, 0xb9, 0x04, 0x5d, 0xf4,
-	0xc2, 0xf4, 0x3a, 0xf5, 0xe1, 0xc2, 0x2c, 0xab, 0xcf, 0xd4, 0xa3, 0x35, 0xeb, 0x2a, 0x14, 0x7d,
-	0xae, 0x9a, 0x9c, 0x0b, 0x17, 0x7c, 0x32, 0x6b, 0x0e, 0xa2, 0x4b, 0x30, 0xcd, 0x1b, 0x8a, 0xd8,
-	0xe1, 0xcd, 0x00, 0x9e, 0x1a, 0xe7, 0x3d, 0x22, 0xeb, 0x01, 0x5c, 0x86, 0x42, 0xcf, 0xb1, 0x7b,
-	0xb6, 0x2b, 0x98, 0xbc, 0x8d, 0x9d, 0xf6, 0xa8, 0x3c, 0x2e, 0x87, 0x53, 0xc5, 0x71, 0x96, 0x2a,
-	0xce, 0xc5, 0x52, 0xc5, 0x45, 0x45, 0x4e, 0xd5, 0x57, 0xa1, 0x18, 0xf2, 0x75, 0xfc, 0x84, 0x6d,
-	0x7d, 0x56, 0x2f, 0xc8, 0x45, 0x2a, 0x7e, 0xa2, 0x35, 0xa1, 0x2c, 0xa7, 0x43, 0x7b, 0x86, 0x43,
-	0xcc, 0x86, 0xd9, 0xe3, 0x5d, 0xcd, 0x53, 0xcc, 0x85, 0xde, 0x53, 0x60, 0x39, 0x4d, 0x8b, 0xb8,
-	0xe6, 0x92, 0x3d, 0x6c, 0x09, 0x72, 0x7e, 0x2f, 0x88, 0xab, 0xd1, 0x03, 0x02, 0xda, 0x87, 0xe9,
-	0x9e, 0x2c, 0x8c, 0xd9, 0x79, 0x6a, 0x73, 0x7d, 0x98, 0x07, 0x86, 0x11, 0x84, 0x65, 0x68, 0x07,
-	0xb0, 0x20, 0xf5, 0x71, 0xf7, 0x6c, 0xbb, 0xe3, 0x59, 0x22, 0x74, 0xd2, 0x94, 0x81, 0x27, 0x2d,
-	0x13, 0x39, 0x69, 0xda, 0xbb, 0x0a, 0x9c, 0x8b, 0x89, 0xfd, 0x7c, 0xb6, 0xce, 0x7f, 0xa0, 0x40,
-	0xde, 0x6b, 0x03, 0x58, 0x4d, 0xb3, 0x85, 0x76, 0x61, 0xa2, 0xc1, 0x7e, 0x09, 0x64, 0xd5, 0x21,
-	0xbd, 0x03, 0xca, 0x5a, 0xe1, 0x7f, 0x78, 0x27, 0x46, 0x4c, 0x57, 0x5f, 0x82, 0x29, 0x89, 0x2c,
-	0x37, 0x29, 0x72, 0xbc, 0x49, 0x51, 0x92, 0x9b, 0x14, 0x39, 0xb9, 0xd9, 0xb0, 0x05, 0x0b, 0xfb,
-	0xfd, 0x7a, 0xd7, 0x24, 0xfb, 0x34, 0xd9, 0x33, 0xad, 0x96, 0x6f, 0xbd, 0x84, 0xbc, 0x50, 0x49,
-	0xca, 0x0b, 0xaf, 0x3d, 0x84, 0x9c, 0xff, 0x92, 0x84, 0x16, 0x00, 0x6d, 0xdd, 0xbd, 0x5b, 0x7b,
-	0xb8, 0xf5, 0xe0, 0xfe, 0xdd, 0xad, 0x83, 0x37, 0xf4, 0xda, 0xeb, 0x3b, 0x5f, 0xdf, 0x9f, 0x39,
-	0x83, 0xce, 0xc3, 0xbc, 0xbe, 0xf3, 0x95, 0x37, 0x1e, 0xee, 0x44, 0x87, 0x14, 0x3a, 0x65, 0x7f,
-	0xe7, 0x20, 0x4a, 0xcf, 0x6c, 0x7e, 0xa0, 0xc2, 0x94, 0x58, 0x7a, 0xdb, 0x30, 0x2d, 0xf4, 0x53,
-	0x05, 0x66, 0xa2, 0xcf, 0x24, 0xa8, 0x92, 0x62, 0xb3, 0x94, 0x67, 0x1f, 0xb5, 0x3a, 0x32, 0x3f,
-	0x37, 0x83, 0x76, 0xf5, 0x3b, 0x7f, 0xf9, 0xe4, 0x87, 0x99, 0x4b, 0xe8, 0x99, 0x6a, 0xc2, 0x53,
-	0x5d, 0x35, 0xe4, 0x27, 0x1f, 0x8a, 0xe7, 0xa6, 0x84, 0xb7, 0x11, 0xf4, 0xc2, 0x00, 0xbd, 0xe9,
-	0x8f, 0x69, 0xea, 0xad, 0x93, 0x4e, 0x13, 0xa8, 0x9f, 0x67, 0xa8, 0xaf, 0xa3, 0xab, 0x43, 0x51,
-	0x57, 0xc5, 0x1b, 0x0b, 0xfa, 0x9e, 0x02, 0x68, 0x9f, 0x38, 0xd8, 0xe8, 0x86, 0x80, 0x2f, 0x54,
-	0xf8, 0xeb, 0x66, 0xc5, 0x7b, 0xdd, 0xac, 0xec, 0x74, 0x7b, 0xe4, 0x58, 0x1d, 0xe1, 0x18, 0x69,
-	0x1b, 0x0c, 0xc5, 0x35, 0xb4, 0x36, 0x1c, 0x85, 0xcb, 0x34, 0x6f, 0x28, 0xe8, 0x27, 0x0a, 0x9c,
-	0xe7, 0x30, 0x92, 0xcc, 0x98, 0x86, 0x66, 0xf4, 0x47, 0x25, 0xed, 0x36, 0x03, 0xb5, 0x89, 0x36,
-	0x46, 0x36, 0x4d, 0x00, 0xee, 0x67, 0x0a, 0x14, 0x23, 0xd1, 0x06, 0xad, 0x0f, 0x37, 0x84, 0x14,
-	0xec, 0xd4, 0xca, 0xa8, 0xec, 0x62, 0x27, 0x2b, 0x0c, 0xee, 0x1a, 0xba, 0x32, 0x1c, 0x6e, 0x8f,
-	0xc2, 0xf9, 0xbe, 0x02, 0x10, 0xbc, 0x0a, 0xa1, 0xb5, 0x01, 0x0e, 0x14, 0x7a, 0xfa, 0x4a, 0x35,
-	0x61, 0xfc, 0x89, 0x49, 0xbb, 0xc4, 0x30, 0x5d, 0x44, 0x17, 0x12, 0x31, 0xd5, 0xb9, 0xe6, 0x6f,
-	0x43, 0x9e, 0xef, 0xa3, 0x40, 0x92, 0xb6, 0x75, 0x23, 0x3f, 0xf5, 0x68, 0xd7, 0x98, 0xda, 0x67,
-	0x91, 0x36, 0x40, 0x6d, 0xb0, 0x57, 0xdf, 0x84, 0x22, 0xd7, 0x1f, 0xbc, 0xfb, 0xa4, 0x41, 0x48,
-	0x6b, 0x75, 0xf8, 0x33, 0xb5, 0x75, 0xa6, 0x7a, 0x15, 0x5d, 0x4e, 0x54, 0xcd, 0xfe, 0x1b, 0x81,
-	0x16, 0x4e, 0x81, 0xf6, 0x1e, 0xe4, 0x77, 0x59, 0x7b, 0xe2, 0x33, 0xab, 0xbe, 0xc2, 0x54, 0x97,
-	0xd1, 0xf2, 0x60, 0xd5, 0xe8, 0xc7, 0x0a, 0x94, 0xd8, 0x5e, 0x45, 0xd3, 0xab, 0xe7, 0x06, 0x6c,
-	0x6c, 0xec, 0x65, 0x42, 0x5d, 0x1d, 0xb1, 0x81, 0xad, 0xad, 0x32, 0x5c, 0xcf, 0xa0, 0x95, 0x64,
-	0x5c, 0x81, 0xfe, 0x9f, 0x47, 0x1b, 0x96, 0x7e, 0x11, 0x7d, 0x63, 0x00, 0xb2, 0xb4, 0xee, 0x77,
-	0xaa, 0xbf, 0xc4, 0x26, 0xa4, 0x85, 0xee, 0xa0, 0x4e, 0xac, 0xfa, 0x8d, 0xe0, 0xef, 0x2a, 0x50,
-	0x08, 0x37, 0x55, 0x07, 0x9a, 0x2d, 0xd6, 0x7b, 0x55, 0x9f, 0x19, 0xda, 0xf8, 0xd3, 0xca, 0x0c,
-	0x8e, 0x8a, 0x16, 0xd3, 0xe0, 0xa0, 0x6f, 0x31, 0xa7, 0xf1, 0xa7, 0xa0, 0x6b, 0x29, 0x42, 0x13,
-	0x5a, 0xa2, 0xea, 0xd0, 0x76, 0x9d, 0xb6, 0xc2, 0xf4, 0x9f, 0x47, 0xe7, 0x52, 0xf4, 0xa3, 0xdf,
-	0x2a, 0xb0, 0x34, 0xa8, 0x8b, 0x87, 0x5e, 0x1e, 0x01, 0x4f, 0x4a, 0xeb, 0x2f, 0xd5, 0xaf, 0xa2,
-	0xfc, 0x69, 0x57, 0x97, 0xb4, 0x6b, 0xbc, 0x72, 0x77, 0x31, 0x69, 0x08, 0x5c, 0x4f, 0x61, 0x56,
-	0x86, 0xc0, 0xcb, 0xf1, 0xb4, 0x13, 0x77, 0x79, 0x98, 0xa1, 0xd8, 0xf4, 0xb4, 0x63, 0x27, 0xc1,
-	0x78, 0xcc, 0xd4, 0xfc, 0x46, 0x81, 0x73, 0xa1, 0x5c, 0x3f, 0x68, 0x35, 0xa1, 0xcd, 0xa1, 0x09,
-	0x73, 0xac, 0xb1, 0xa5, 0xde, 0x38, 0xd1, 0x1c, 0x11, 0x90, 0x9f, 0x63, 0x60, 0xaf, 0xa0, 0x67,
-	0x53, 0xc1, 0xf6, 0x24, 0x58, 0xbf, 0x16, 0xff, 0x6f, 0x92, 0x58, 0x91, 0xde, 0x1a, 0xc5, 0xed,
-	0xe3, 0x25, 0xbb, 0x7a, 0xfd, 0x04, 0xe5, 0xe9, 0x08, 0x78, 0xe5, 0x5a, 0xf5, 0x43, 0x05, 0xce,
-	0xa7, 0x96, 0x53, 0xe8, 0xc5, 0x11, 0x9c, 0x32, 0xa9, 0x00, 0x53, 0x5f, 0x38, 0x59, 0x39, 0x33,
-	0xe4, 0x42, 0x96, 0x6d, 0x1d, 0xc2, 0xe7, 0x42, 0x71, 0x17, 0x93, 0x50, 0xe2, 0x9f, 0xe6, 0x9a,
-	0x97, 0x46, 0x28, 0x00, 0x86, 0x5c, 0xbe, 0xbc, 0x22, 0xa0, 0x89, 0x4a, 0x89, 0xdf, 0x7e, 0x41,
-	0x00, 0xba, 0x6f, 0x35, 0x6d, 0x74, 0x75, 0xd8, 0xa2, 0xfd, 0x7f, 0x23, 0x53, 0x9f, 0x1d, 0xc6,
-	0x4a, 0x05, 0x6a, 0x37, 0x18, 0x9c, 0x75, 0x74, 0x3d, 0x11, 0x8e, 0x64, 0x15, 0xd3, 0x6a, 0xda,
-	0xe2, 0x7e, 0x5c, 0x53, 0x36, 0x14, 0xf4, 0xae, 0xe2, 0x95, 0x1e, 0x5b, 0x7e, 0xf9, 0xce, 0x4b,
-	0x10, 0xb4, 0x3a, 0x30, 0x47, 0x0a, 0x18, 0xd5, 0xb4, 0xdc, 0x2b, 0xb9, 0xa4, 0xd1, 0x6e, 0x31,
-	0xac, 0x1b, 0xa8, 0x92, 0x88, 0xd5, 0x15, 0xec, 0x6e, 0xd5, 0xeb, 0x27, 0x54, 0x5d, 0x26, 0x47,
-	0x82, 0xba, 0xe7, 0xf7, 0x10, 0x86, 0x40, 0x8d, 0x32, 0xfe, 0xaf, 0xa0, 0x7a, 0x4d, 0x0d, 0x01,
-	0x75, 0xfb, 0x17, 0xca, 0x1f, 0x3f, 0x5e, 0x56, 0xfe, 0xfc, 0xf1, 0xb2, 0xf2, 0xf7, 0x8f, 0x97,
-	0x15, 0x38, 0x6f, 0x3b, 0xad, 0x64, 0xc5, 0xdb, 0x33, 0x52, 0x6d, 0xb5, 0x47, 0xfd, 0x70, 0x4f,
-	0xf9, 0xc6, 0x2d, 0xe9, 0x7f, 0x26, 0x7b, 0xce, 0xb1, 0xdb, 0x35, 0x88, 0xd9, 0xe8, 0x18, 0x75,
-	0xb7, 0xea, 0xc9, 0x30, 0x7a, 0xa6, 0x1b, 0x82, 0xf4, 0x05, 0x4c, 0xda, 0xbf, 0xca, 0xcc, 0xef,
-	0x78, 0x3a, 0x76, 0x24, 0x1d, 0x7f, 0x0a, 0xe8, 0x6f, 0xef, 0x90, 0xf6, 0xdb, 0x1e, 0xbd, 0x3e,
-	0xc1, 0x1c, 0xff, 0xc6, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x51, 0x4e, 0x5b, 0x2f, 0xdc, 0x29,
-	0x00, 0x00,
+	0x2c, 0x63, 0xd2, 0xae, 0x1d, 0xbd, 0x68, 0x74, 0x7a, 0x6d, 0xe3, 0xc5, 0xda, 0x01, 0x36, 0x1a,
+	0xb6, 0x55, 0x6f, 0xb4, 0x0d, 0xd3, 0xaa, 0xf6, 0x1c, 0x9b, 0xd8, 0x68, 0x1e, 0x93, 0x36, 0x76,
+	0x70, 0xbf, 0x5b, 0xc5, 0xa4, 0x5d, 0xf5, 0x38, 0xd5, 0xb5, 0x96, 0x49, 0xda, 0xfd, 0x83, 0x6a,
+	0xc3, 0xee, 0xd6, 0x5a, 0x76, 0xcb, 0xae, 0x31, 0xee, 0x83, 0x7e, 0x93, 0x7d, 0xb1, 0x0f, 0xf6,
+	0x8b, 0x4b, 0x51, 0x17, 0x5b, 0xb6, 0xdd, 0xea, 0xe0, 0x9a, 0xd1, 0x33, 0x6b, 0x86, 0x65, 0xd9,
+	0xc4, 0x20, 0xa6, 0x6d, 0xb9, 0x62, 0xf4, 0x9c, 0x18, 0xf5, 0x65, 0xe0, 0x6e, 0x8f, 0x1c, 0x8b,
+	0xc1, 0xb3, 0xd1, 0x41, 0xc3, 0xf2, 0x86, 0x96, 0x42, 0xe0, 0x0d, 0x42, 0xb0, 0xcb, 0x05, 0x8b,
+	0xf1, 0xc4, 0xc5, 0x1d, 0x74, 0xec, 0xc6, 0x43, 0x0f, 0x56, 0x88, 0xe1, 0xc8, 0xe8, 0x98, 0x87,
+	0x06, 0xb1, 0x1d, 0x3e, 0xaa, 0xd9, 0x80, 0xee, 0x7b, 0xa4, 0x5b, 0x6d, 0xc3, 0x6a, 0xe1, 0x3d,
+	0x4c, 0xd0, 0x4d, 0x98, 0x30, 0x1a, 0x54, 0x49, 0x59, 0xa9, 0x28, 0xab, 0x85, 0x8d, 0x4a, 0x35,
+	0xd1, 0x42, 0xd5, 0x3d, 0x4c, 0x36, 0x19, 0x9f, 0x2e, 0xf8, 0xd1, 0x32, 0x4c, 0xf5, 0xfa, 0x07,
+	0x1d, 0xb3, 0x51, 0x7f, 0x88, 0x8f, 0xdd, 0x72, 0xa6, 0x32, 0xb6, 0x9a, 0xd7, 0x81, 0x93, 0xde,
+	0xc4, 0xc7, 0xae, 0xf6, 0x81, 0x02, 0x4b, 0xf7, 0x4c, 0x97, 0xdc, 0xb5, 0x0e, 0xf1, 0x63, 0x7c,
+	0xb8, 0x19, 0x2c, 0xc8, 0xd5, 0xf1, 0xa3, 0x3e, 0x76, 0x09, 0x5a, 0x80, 0x71, 0xdc, 0xb3, 0x1b,
+	0x6d, 0xa6, 0x3c, 0x7b, 0xe7, 0x94, 0xce, 0x3f, 0xd1, 0x45, 0x98, 0x6e, 0x61, 0x0b, 0xbb, 0xa6,
+	0x5b, 0xe7, 0xe3, 0x99, 0x8a, 0xb2, 0x3a, 0x79, 0xe7, 0x94, 0x9e, 0x17, 0xe4, 0x6d, 0xc6, 0x76,
+	0x0e, 0x72, 0x3d, 0xa3, 0x85, 0xeb, 0xae, 0xf9, 0x04, 0x97, 0xc7, 0x2a, 0xca, 0xea, 0xb8, 0x3e,
+	0x49, 0x09, 0x7b, 0xe6, 0x13, 0x8c, 0xce, 0x03, 0xb0, 0x41, 0x62, 0x3f, 0xc4, 0x56, 0x39, 0x5b,
+	0x51, 0x56, 0x73, 0x3a, 0x63, 0xdf, 0xa7, 0x84, 0xad, 0x02, 0xe4, 0x1f, 0xf5, 0xb1, 0x73, 0x5c,
+	0x6f, 0x9a, 0x1d, 0x82, 0x1d, 0xed, 0x97, 0x0a, 0x9c, 0xa1, 0x68, 0x3f, 0xe7, 0x30, 0xdf, 0x57,
+	0xa0, 0x1c, 0x87, 0xe9, 0xf6, 0x6c, 0xcb, 0xc5, 0xe8, 0x4b, 0x90, 0x97, 0xdc, 0xc6, 0x2d, 0x2b,
+	0x95, 0xb1, 0xd5, 0xa9, 0x0d, 0x2d, 0x65, 0x4b, 0x25, 0x11, 0x7a, 0x68, 0x1e, 0xba, 0x04, 0x45,
+	0x0b, 0x3f, 0x26, 0x75, 0x09, 0x58, 0x86, 0x01, 0x9b, 0xa6, 0xe4, 0x5d, 0x0f, 0x1c, 0xc5, 0x4e,
+	0x6c, 0x62, 0x74, 0xe4, 0x95, 0xe5, 0x18, 0x85, 0x2e, 0x4d, 0xfb, 0x83, 0x02, 0xcb, 0xa9, 0x0e,
+	0x20, 0x20, 0x3f, 0x80, 0x92, 0xc9, 0x87, 0xeb, 0x09, 0xd0, 0x2f, 0xa7, 0x40, 0x8f, 0x4b, 0xd4,
+	0xe7, 0xcc, 0xb8, 0x96, 0x93, 0x5a, 0xc8, 0xef, 0x15, 0x98, 0xa5, 0x0b, 0xd9, 0xa2, 0x87, 0xcd,
+	0xf7, 0x8a, 0x12, 0x64, 0x1d, 0xdb, 0x26, 0xcc, 0x29, 0xf2, 0x77, 0x4e, 0xe9, 0xec, 0x8b, 0x52,
+	0xdd, 0x8e, 0x4d, 0x98, 0x1e, 0xea, 0x2a, 0xec, 0x2b, 0xf0, 0xa0, 0xb1, 0xb0, 0x07, 0xa9, 0x70,
+	0x5a, 0xb8, 0x0a, 0xdb, 0x7a, 0xea, 0x3b, 0x1e, 0x21, 0xec, 0x36, 0xe3, 0x03, 0xdd, 0x66, 0x62,
+	0x98, 0xdb, 0x7c, 0xa8, 0x00, 0x92, 0x57, 0x20, 0xac, 0xff, 0x36, 0x14, 0x59, 0x00, 0xb9, 0x65,
+	0x5b, 0xc4, 0x30, 0x2d, 0xec, 0x78, 0x86, 0xbf, 0x9a, 0x62, 0xf8, 0x2d, 0x16, 0x75, 0xb6, 0x42,
+	0x73, 0xf4, 0xa8, 0x8c, 0x93, 0x32, 0x7b, 0x1f, 0x4a, 0x49, 0xfa, 0xd0, 0xeb, 0x30, 0xce, 0x34,
+	0x32, 0xcb, 0x4f, 0x6d, 0xac, 0xa6, 0x85, 0x2c, 0xb3, 0x65, 0xe1, 0x43, 0x49, 0x82, 0xce, 0xa7,
+	0x51, 0xb5, 0xec, 0x47, 0x9d, 0x6d, 0x1f, 0x45, 0x96, 0xd7, 0x73, 0x8c, 0xa2, 0xdb, 0x36, 0xd1,
+	0xfe, 0x93, 0x85, 0xdc, 0x2d, 0x7a, 0x67, 0xdc, 0xc1, 0xc6, 0x21, 0xdd, 0x85, 0x36, 0x36, 0x0e,
+	0xeb, 0x6c, 0x53, 0xd9, 0xf9, 0xd7, 0x27, 0x29, 0x61, 0x8f, 0x6e, 0xeb, 0x79, 0x00, 0x36, 0x18,
+	0x9c, 0xfe, 0xac, 0xce, 0xd8, 0xf9, 0xc1, 0x7f, 0x05, 0x8a, 0x6c, 0x58, 0xd2, 0x46, 0x17, 0x99,
+	0xdf, 0x9a, 0xfd, 0xec, 0xe3, 0xe5, 0x69, 0xd7, 0x7d, 0xb2, 0x46, 0x17, 0xfe, 0xaa, 0x76, 0x6d,
+	0x43, 0xd3, 0xa7, 0x29, 0xe7, 0x96, 0x07, 0x02, 0x5d, 0x84, 0x42, 0xd3, 0xb4, 0x8c, 0x8e, 0xf9,
+	0x04, 0x0b, 0xdd, 0x59, 0x26, 0x7d, 0xda, 0xa7, 0x32, 0x00, 0x2b, 0x50, 0x0c, 0xd8, 0x38, 0x8a,
+	0x71, 0xc6, 0x17, 0xcc, 0xe6, 0x50, 0x6e, 0x41, 0x29, 0x60, 0x94, 0xf0, 0x4c, 0xa4, 0xe1, 0x41,
+	0x3e, 0x7b, 0x08, 0xd4, 0xbb, 0x7d, 0x97, 0x98, 0x4d, 0xd3, 0x03, 0x75, 0x9a, 0x83, 0xf2, 0xa9,
+	0x1e, 0xa8, 0x80, 0x8d, 0x83, 0x9a, 0xe4, 0xa0, 0x7c, 0xb2, 0x0f, 0x2a, 0x60, 0x94, 0x40, 0xe5,
+	0x52, 0x41, 0xf9, 0xec, 0x01, 0xa8, 0x1b, 0x70, 0xa6, 0xe7, 0xe0, 0x23, 0xd3, 0xee, 0xbb, 0xf5,
+	0x08, 0x3a, 0x60, 0x5a, 0xe7, 0xbd, 0xe1, 0x2f, 0x87, 0x50, 0xde, 0x84, 0x72, 0xc2, 0x3c, 0x0e,
+	0x77, 0x8a, 0x4d, 0x5c, 0x88, 0x4d, 0xe4, 0xb0, 0xf7, 0xe1, 0x7c, 0xc2, 0x4c, 0x09, 0x7f, 0x3e,
+	0x0d, 0xbf, 0x1a, 0x93, 0xe8, 0xaf, 0x43, 0x7b, 0x07, 0xe6, 0xe9, 0x09, 0xbd, 0x65, 0x77, 0xbb,
+	0x26, 0x21, 0x18, 0x0f, 0xbd, 0x7d, 0xa4, 0xd8, 0x91, 0x89, 0xc4, 0x8e, 0xd8, 0xf9, 0xff, 0xeb,
+	0x18, 0xcc, 0xf0, 0x93, 0x10, 0xc8, 0x47, 0xa5, 0x90, 0x60, 0x4f, 0xec, 0xd7, 0x00, 0x1a, 0x3e,
+	0x0f, 0xbb, 0xd6, 0xa7, 0x36, 0x5e, 0x1e, 0x18, 0x0e, 0x02, 0x91, 0xd5, 0xe0, 0xe7, 0xb6, 0x45,
+	0x9c, 0x63, 0x5d, 0x12, 0x85, 0xae, 0xc3, 0x02, 0x4d, 0x1d, 0x8e, 0x70, 0xdd, 0x4f, 0x4d, 0xea,
+	0x0d, 0xbb, 0x6f, 0xf1, 0x43, 0x91, 0xd5, 0x4b, 0x7c, 0x34, 0x48, 0x52, 0xe8, 0x98, 0xfa, 0x1a,
+	0x4c, 0xfb, 0x42, 0xef, 0x12, 0xdc, 0x45, 0x57, 0x61, 0x36, 0x98, 0x6f, 0x5a, 0x87, 0x66, 0x03,
+	0xf3, 0xa8, 0x95, 0xd5, 0x67, 0xfc, 0x81, 0xbb, 0x9c, 0xae, 0xb6, 0xa0, 0x10, 0x40, 0xa2, 0xe6,
+	0x45, 0x6f, 0x87, 0x96, 0xc7, 0xa3, 0xdd, 0x4b, 0x4f, 0xbd, 0x3c, 0x8a, 0x44, 0x5e, 0x9c, 0xda,
+	0x87, 0x62, 0x64, 0xed, 0x68, 0x06, 0xc6, 0x1e, 0xe2, 0x63, 0x61, 0x5c, 0xfa, 0x13, 0xdd, 0x83,
+	0xf1, 0x23, 0xa3, 0xd3, 0xc7, 0x6c, 0xbf, 0xa6, 0x36, 0x6e, 0x3c, 0xbd, 0x55, 0xe9, 0x12, 0x74,
+	0x2e, 0xe4, 0xd5, 0xcc, 0x4d, 0x45, 0xfb, 0x97, 0x02, 0x8b, 0x94, 0xe6, 0x1b, 0x6d, 0xcb, 0xe8,
+	0x18, 0x56, 0xe3, 0x99, 0x9c, 0x07, 0x5d, 0x0f, 0x67, 0x76, 0x63, 0x34, 0xb3, 0xdb, 0x9a, 0xfb,
+	0xec, 0xe3, 0xe5, 0x62, 0xe0, 0xcd, 0x6f, 0xbc, 0x70, 0xfd, 0xa6, 0x26, 0xa7, 0x7b, 0xa8, 0x0c,
+	0xa7, 0xbd, 0xdd, 0xc8, 0xb2, 0xdd, 0xf0, 0x3e, 0x4f, 0xf4, 0x22, 0xfb, 0x20, 0x03, 0xb3, 0xb1,
+	0xc5, 0xa6, 0x78, 0xf2, 0x3d, 0x98, 0x3c, 0x10, 0x1c, 0xc2, 0x8f, 0xd7, 0x53, 0x2c, 0x1e, 0x93,
+	0x58, 0x15, 0x3f, 0x74, 0x5f, 0x42, 0xd2, 0xa5, 0x36, 0x36, 0xfc, 0x52, 0xcb, 0x46, 0x2e, 0x35,
+	0xf5, 0x21, 0x9c, 0x16, 0xb2, 0xd1, 0x3a, 0x40, 0x60, 0x67, 0x9e, 0x46, 0x44, 0x83, 0x06, 0x35,
+	0x72, 0xce, 0x37, 0x32, 0x5d, 0x27, 0x4b, 0x73, 0xc4, 0x55, 0xc3, 0x3f, 0xa8, 0xe5, 0x05, 0x4a,
+	0x71, 0x92, 0xbc, 0x4f, 0xed, 0x1f, 0x0a, 0x0f, 0x2a, 0xfe, 0xfa, 0x9e, 0xc9, 0x2f, 0x16, 0x78,
+	0xad, 0x70, 0xc4, 0xd5, 0x4c, 0xea, 0xe2, 0x2b, 0xbc, 0xbf, 0xd9, 0x81, 0xfb, 0x3b, 0x1e, 0xd9,
+	0xdf, 0x68, 0x15, 0x31, 0x11, 0xad, 0x22, 0x64, 0xb7, 0x3a, 0x1d, 0x72, 0xab, 0x98, 0x6b, 0x3c,
+	0x82, 0xb9, 0x1d, 0x1c, 0x2c, 0x55, 0x5a, 0x29, 0xb7, 0x99, 0xbf, 0x52, 0x6e, 0xb5, 0x8d, 0x90,
+	0xf5, 0x33, 0x29, 0xd6, 0xbf, 0x73, 0x4a, 0xb2, 0x7f, 0x3c, 0xad, 0xca, 0x00, 0x04, 0xb6, 0x4d,
+	0x71, 0xc3, 0x77, 0xa0, 0x10, 0x04, 0xac, 0x8e, 0xe9, 0x12, 0xe1, 0x8c, 0xd7, 0x87, 0x39, 0xa3,
+	0x5b, 0x95, 0x62, 0xa1, 0x97, 0x6c, 0x4d, 0xfb, 0xb2, 0x58, 0x38, 0x3b, 0x21, 0xaf, 0x7c, 0x57,
+	0x2e, 0x0e, 0xfd, 0x44, 0xab, 0x14, 0x32, 0x9d, 0x67, 0xb8, 0xd7, 0x21, 0xe7, 0x63, 0x10, 0x91,
+	0xac, 0x32, 0x6c, 0x29, 0x7a, 0x30, 0x45, 0x33, 0xe1, 0x82, 0xbc, 0x4f, 0x9b, 0xcc, 0x89, 0xf6,
+	0x30, 0xe1, 0x45, 0xe9, 0x89, 0x5e, 0x7b, 0x9f, 0x8e, 0xc1, 0x4c, 0x54, 0x7e, 0xca, 0x2e, 0xed,
+	0xc0, 0x3c, 0x73, 0x67, 0x83, 0xe0, 0xc3, 0x7a, 0xac, 0xb0, 0x4d, 0x0e, 0x7f, 0x73, 0xfe, 0x8c,
+	0xdd, 0xc0, 0x61, 0xaf, 0xc2, 0x6c, 0x20, 0xc8, 0x73, 0xdd, 0x31, 0x7e, 0x3f, 0xf9, 0x03, 0xe2,
+	0x7e, 0x42, 0x9b, 0x80, 0xf0, 0x63, 0x33, 0xaa, 0x32, 0x9b, 0xae, 0x72, 0x86, 0xb3, 0x4b, 0xfa,
+	0x2e, 0x42, 0x41, 0x88, 0xf0, 0x94, 0x8d, 0x33, 0x65, 0xd3, 0x9c, 0xea, 0x69, 0xba, 0x05, 0x73,
+	0x6e, 0xc7, 0x70, 0xdb, 0x11, 0x55, 0x13, 0xe9, 0xaa, 0x66, 0x05, 0xbf, 0xa4, 0x6b, 0x05, 0x8a,
+	0x9e, 0x90, 0xf0, 0xa1, 0x2c, 0x08, 0xb2, 0xa4, 0x0d, 0xbf, 0x8b, 0x1b, 0xd1, 0x85, 0x4d, 0x0e,
+	0xd0, 0x26, 0xf8, 0xc3, 0xda, 0x3c, 0x21, 0x9e, 0xb6, 0x1c, 0xd7, 0x26, 0xc8, 0x42, 0x9b, 0xf6,
+	0x00, 0xce, 0xf9, 0xee, 0xb4, 0x8b, 0x9d, 0xa6, 0xed, 0x74, 0x59, 0xf0, 0x16, 0x9e, 0x74, 0x21,
+	0x1c, 0x63, 0x14, 0x06, 0x22, 0x53, 0x56, 0xd2, 0xe2, 0x4c, 0x26, 0x14, 0x67, 0xb4, 0xbf, 0x65,
+	0x61, 0x31, 0x59, 0xbc, 0xa8, 0xa2, 0x5e, 0x03, 0xb5, 0xd1, 0x77, 0x1c, 0x6c, 0x91, 0x3a, 0x6e,
+	0x36, 0x31, 0xcf, 0x71, 0xfc, 0x9b, 0x87, 0xa7, 0x26, 0x65, 0xc1, 0xb1, 0xed, 0x31, 0xf8, 0x77,
+	0xd7, 0x0a, 0x14, 0x4d, 0xab, 0xd1, 0xe9, 0xbb, 0xa6, 0x6d, 0xb1, 0xb4, 0xd5, 0x03, 0x50, 0xf0,
+	0xc9, 0x34, 0x5f, 0x75, 0x51, 0x0d, 0xe6, 0x02, 0xc6, 0x43, 0xd3, 0x25, 0x5c, 0x3e, 0x77, 0x2d,
+	0xe4, 0x0f, 0xdd, 0xf6, 0x46, 0x68, 0xc2, 0xd5, 0xb0, 0x1d, 0x07, 0x37, 0x48, 0xe7, 0xb8, 0x7e,
+	0x64, 0x53, 0x3b, 0xba, 0x76, 0xdf, 0x69, 0x60, 0xe6, 0x60, 0x93, 0x7a, 0xc9, 0x1f, 0xbd, 0x4f,
+	0x07, 0xf7, 0xd8, 0x58, 0xd2, 0x2c, 0x62, 0x38, 0x2d, 0x4c, 0x98, 0x5f, 0xc5, 0x66, 0xed, 0xb3,
+	0x31, 0xb4, 0x0e, 0xa5, 0xe8, 0x2c, 0x5a, 0xd0, 0x30, 0xff, 0x9a, 0xd4, 0x51, 0x78, 0x0e, 0x2b,
+	0xac, 0x76, 0xa0, 0xe2, 0xd9, 0xa8, 0x7e, 0x80, 0x9b, 0xb6, 0x83, 0x79, 0xf2, 0x5d, 0x27, 0x8e,
+	0x61, 0xb9, 0x26, 0xeb, 0x49, 0x71, 0xe7, 0x3a, 0xef, 0xf1, 0x6d, 0x31, 0x36, 0x96, 0x84, 0xef,
+	0xfb, 0x4c, 0x68, 0x1b, 0x96, 0x7d, 0x41, 0x46, 0x93, 0x60, 0x27, 0x2e, 0x67, 0x92, 0xc9, 0x59,
+	0xf4, 0xd8, 0x36, 0x29, 0x57, 0x54, 0xcc, 0x1a, 0xa0, 0xae, 0xe9, 0xba, 0xa6, 0xd5, 0x0a, 0xf2,
+	0x53, 0xee, 0x70, 0x79, 0x7d, 0x56, 0x8c, 0x48, 0xb1, 0x7e, 0x07, 0x2a, 0xc6, 0x11, 0x76, 0x68,
+	0xd8, 0x8d, 0x65, 0xb5, 0xde, 0x6d, 0x4c, 0xeb, 0x8f, 0x8c, 0x7e, 0x5e, 0xf0, 0x6d, 0x86, 0xd3,
+	0x5b, 0xe1, 0x00, 0xda, 0xef, 0x32, 0x50, 0xf0, 0x89, 0x5f, 0xed, 0xe3, 0x3e, 0xa6, 0x97, 0x62,
+	0xa3, 0xdd, 0x77, 0xac, 0x7a, 0xc7, 0xec, 0x9a, 0x5e, 0xd5, 0x09, 0x8c, 0x74, 0x8f, 0x52, 0xd0,
+	0x9b, 0x22, 0x95, 0x66, 0x6d, 0x8e, 0x84, 0x68, 0x35, 0x9f, 0x70, 0xc2, 0xca, 0x8a, 0xc8, 0xb0,
+	0xd9, 0x24, 0xe9, 0x98, 0xbd, 0x01, 0x2c, 0xa8, 0xd4, 0xe3, 0x39, 0x5f, 0x8a, 0x18, 0x16, 0x6f,
+	0x24, 0x01, 0x5f, 0x84, 0x45, 0x09, 0x4d, 0x3c, 0x39, 0xe7, 0xe9, 0xa0, 0x1a, 0xf0, 0xdc, 0x8f,
+	0xa4, 0xe9, 0xd4, 0xe7, 0x18, 0x84, 0xf8, 0x5c, 0x1e, 0xcb, 0x4a, 0x74, 0x34, 0x3a, 0x4b, 0xfb,
+	0xb7, 0xe8, 0x2f, 0x05, 0x57, 0x89, 0xeb, 0x9a, 0x2d, 0xab, 0x8b, 0x2d, 0xf2, 0x7f, 0x9b, 0xff,
+	0xfe, 0x73, 0x0c, 0x4a, 0x49, 0xeb, 0x4d, 0xb9, 0xd5, 0x0c, 0x98, 0x32, 0x02, 0x26, 0x91, 0x78,
+	0xbc, 0x31, 0xec, 0xb6, 0x96, 0xe4, 0x06, 0xb5, 0x47, 0x40, 0xd4, 0x65, 0x99, 0x27, 0x95, 0x81,
+	0xfc, 0x28, 0x03, 0x73, 0x09, 0xba, 0xe8, 0x75, 0xea, 0xf5, 0xf1, 0xc3, 0x65, 0x5b, 0x56, 0x9f,
+	0x39, 0x88, 0x56, 0xb4, 0x2b, 0x50, 0xf4, 0xb9, 0xea, 0x72, 0xa6, 0x5c, 0xf0, 0xc9, 0xac, 0x75,
+	0x88, 0x2e, 0xc0, 0x34, 0x6f, 0x37, 0x62, 0x87, 0xb7, 0x0a, 0x78, 0xe2, 0x9c, 0xf7, 0x88, 0xac,
+	0x43, 0x70, 0x11, 0x0a, 0x3d, 0xc7, 0xee, 0xd9, 0xae, 0x60, 0xf2, 0x36, 0x76, 0xda, 0xa3, 0xf2,
+	0xb8, 0x1c, 0x4e, 0x24, 0xc7, 0x59, 0x22, 0x39, 0x17, 0x4b, 0x24, 0xcb, 0x8a, 0x9c, 0xc8, 0xaf,
+	0x40, 0x31, 0xe4, 0xeb, 0xf8, 0x31, 0xdb, 0xfa, 0xac, 0x5e, 0x90, 0x4b, 0x58, 0xfc, 0x58, 0x6b,
+	0x42, 0x45, 0x4e, 0x96, 0x76, 0x0d, 0x87, 0x98, 0x0d, 0xb3, 0xc7, 0x7b, 0x9e, 0x27, 0x98, 0x29,
+	0xbd, 0xaf, 0xc0, 0x52, 0x9a, 0x16, 0x71, 0xcd, 0x25, 0x7b, 0xd8, 0x22, 0xe4, 0xfc, 0x4e, 0x11,
+	0x57, 0xa3, 0x07, 0x04, 0xb4, 0x07, 0xd3, 0x3d, 0x59, 0x18, 0xb3, 0xf3, 0xd4, 0xc6, 0xda, 0x30,
+	0x0f, 0x0c, 0x23, 0x08, 0xcb, 0xd0, 0xf6, 0x61, 0x41, 0xea, 0xf2, 0xee, 0xda, 0x76, 0xc7, 0xb3,
+	0x44, 0xe8, 0xa4, 0x29, 0x03, 0x4f, 0x5a, 0x26, 0x72, 0xd2, 0xb4, 0xf7, 0x14, 0x38, 0x13, 0x13,
+	0xfb, 0xf9, 0x6c, 0xac, 0xff, 0x40, 0x81, 0xbc, 0xd7, 0x24, 0xb0, 0x9a, 0x66, 0x0b, 0xed, 0xc0,
+	0x44, 0x83, 0xfd, 0x12, 0xc8, 0x6a, 0x43, 0x3a, 0x0b, 0x94, 0xb5, 0xca, 0xff, 0xf0, 0x3e, 0x8d,
+	0x98, 0xae, 0xbe, 0x02, 0x53, 0x12, 0x59, 0x6e, 0x61, 0xe4, 0x78, 0x0b, 0xa3, 0x24, 0xb7, 0x30,
+	0x72, 0x72, 0x2b, 0x62, 0x13, 0x16, 0xf6, 0xfa, 0x07, 0x5d, 0x93, 0xec, 0xd1, 0x54, 0xd0, 0xb4,
+	0x5a, 0xbe, 0xf5, 0x12, 0xb2, 0x46, 0x25, 0x29, 0x6b, 0xbc, 0x72, 0x1f, 0x72, 0xfe, 0x3b, 0x13,
+	0x5a, 0x00, 0xb4, 0x79, 0xfb, 0x76, 0xfd, 0xfe, 0xe6, 0xbd, 0xbb, 0xb7, 0x37, 0xf7, 0xdf, 0xd2,
+	0xeb, 0x6f, 0x6e, 0x7f, 0x7d, 0x6f, 0xe6, 0x14, 0x3a, 0x0b, 0xf3, 0xfa, 0xf6, 0x57, 0xde, 0xba,
+	0xbf, 0x1d, 0x1d, 0x52, 0xe8, 0x94, 0xbd, 0xed, 0xfd, 0x28, 0x3d, 0xb3, 0xf1, 0xa1, 0x0a, 0x53,
+	0x62, 0xe9, 0x6d, 0xc3, 0xb4, 0xd0, 0x4f, 0x15, 0x98, 0x89, 0x3e, 0xa2, 0xa0, 0x6a, 0x8a, 0xcd,
+	0x52, 0x1e, 0x85, 0xd4, 0xda, 0xc8, 0xfc, 0xdc, 0x0c, 0xda, 0xe5, 0xef, 0xfc, 0xe5, 0xd3, 0x1f,
+	0x66, 0x2e, 0xa0, 0xe7, 0x6a, 0x09, 0x0f, 0x79, 0xb5, 0x90, 0x9f, 0x7c, 0x24, 0x1e, 0xa3, 0x12,
+	0x5e, 0x4e, 0xd0, 0x4b, 0x03, 0xf4, 0xa6, 0x3f, 0xb5, 0xa9, 0x37, 0x9e, 0x76, 0x9a, 0x40, 0xfd,
+	0x22, 0x43, 0x7d, 0x15, 0x5d, 0x1e, 0x8a, 0xba, 0x26, 0x5e, 0x60, 0xd0, 0xf7, 0x14, 0x40, 0x7b,
+	0xc4, 0xc1, 0x46, 0x37, 0x04, 0x7c, 0xa1, 0xca, 0xdf, 0x3e, 0xab, 0xde, 0xdb, 0x67, 0x75, 0xbb,
+	0xdb, 0x23, 0xc7, 0xea, 0x08, 0xc7, 0x48, 0x5b, 0x67, 0x28, 0xae, 0xa0, 0xd5, 0xe1, 0x28, 0x5c,
+	0xa6, 0x79, 0x5d, 0x41, 0x3f, 0x51, 0xe0, 0x2c, 0x87, 0x91, 0x64, 0xc6, 0x34, 0x34, 0xa3, 0x3f,
+	0x39, 0x69, 0x37, 0x19, 0xa8, 0x0d, 0xb4, 0x3e, 0xb2, 0x69, 0x02, 0x70, 0x3f, 0x53, 0xa0, 0x18,
+	0x89, 0x36, 0x68, 0x6d, 0xb8, 0x21, 0xa4, 0x60, 0xa7, 0x56, 0x47, 0x65, 0x17, 0x3b, 0x59, 0x65,
+	0x70, 0x57, 0xd1, 0xa5, 0xe1, 0x70, 0x7b, 0x14, 0xce, 0xf7, 0x15, 0x80, 0xe0, 0xcd, 0x08, 0xad,
+	0x0e, 0x70, 0xa0, 0xd0, 0xc3, 0x58, 0xaa, 0x09, 0xe3, 0x0f, 0x50, 0xda, 0x05, 0x86, 0xe9, 0x3c,
+	0x3a, 0x97, 0x88, 0xe9, 0x80, 0x6b, 0xfe, 0x36, 0xe4, 0xf9, 0x3e, 0x0a, 0x24, 0x69, 0x5b, 0x37,
+	0xf2, 0x43, 0x90, 0x76, 0x85, 0xa9, 0x7d, 0x1e, 0x69, 0x03, 0xd4, 0x06, 0x7b, 0xf5, 0x4d, 0x28,
+	0x72, 0xfd, 0xc1, 0xab, 0x50, 0x1a, 0x84, 0xb4, 0x46, 0x88, 0x3f, 0x53, 0x5b, 0x63, 0xaa, 0x57,
+	0xd0, 0xc5, 0x44, 0xd5, 0xec, 0x7f, 0x15, 0x68, 0xe1, 0x14, 0x68, 0xef, 0x41, 0x7e, 0x87, 0x35,
+	0x2f, 0x9e, 0x59, 0xf5, 0x25, 0xa6, 0xba, 0x82, 0x96, 0x06, 0xab, 0x46, 0x3f, 0x56, 0xa0, 0xc4,
+	0xf6, 0x2a, 0x9a, 0x5e, 0xbd, 0x30, 0x60, 0x63, 0x63, 0xef, 0x16, 0xea, 0xca, 0x88, 0xed, 0x6d,
+	0x6d, 0x85, 0xe1, 0x7a, 0x0e, 0x2d, 0x27, 0xe3, 0x0a, 0xf4, 0xff, 0x3c, 0xda, 0xce, 0xf4, 0x8b,
+	0xe8, 0x6b, 0x03, 0x90, 0xa5, 0xf5, 0xc6, 0x53, 0xfd, 0x25, 0x36, 0x21, 0x2d, 0x74, 0x07, 0x75,
+	0x62, 0xcd, 0x6f, 0x13, 0x7f, 0x57, 0x81, 0x42, 0xb8, 0xe5, 0x3a, 0xd0, 0x6c, 0xb1, 0xce, 0xac,
+	0xfa, 0xdc, 0xd0, 0xb6, 0xa0, 0x56, 0x61, 0x70, 0x54, 0x54, 0x4e, 0x83, 0x83, 0xbe, 0xc5, 0x9c,
+	0xc6, 0x9f, 0x82, 0xae, 0xa4, 0x08, 0x4d, 0x68, 0x98, 0xaa, 0x43, 0x9b, 0x79, 0xda, 0x32, 0xd3,
+	0x7f, 0x16, 0x9d, 0x49, 0xd1, 0x8f, 0x7e, 0xab, 0xc0, 0xe2, 0xa0, 0x1e, 0x1f, 0x7a, 0x75, 0x04,
+	0x3c, 0x29, 0x8d, 0xc1, 0x54, 0xbf, 0x8a, 0xf2, 0xa7, 0x5d, 0x5d, 0xd2, 0xae, 0xf1, 0xca, 0xdd,
+	0xc5, 0xa4, 0x21, 0x70, 0x3d, 0x81, 0x59, 0x19, 0x02, 0x2f, 0xc7, 0xd3, 0x4e, 0xdc, 0xc5, 0x61,
+	0x86, 0x62, 0xd3, 0xd3, 0x8e, 0x9d, 0x04, 0xe3, 0x11, 0x53, 0xf3, 0x1b, 0x05, 0xce, 0x84, 0x72,
+	0xfd, 0xa0, 0xd5, 0x84, 0x36, 0x86, 0x26, 0xcc, 0xb1, 0xb6, 0x97, 0x7a, 0xed, 0xa9, 0xe6, 0x88,
+	0x80, 0xfc, 0x02, 0x03, 0x7b, 0x09, 0x3d, 0x9f, 0x0a, 0xb6, 0x27, 0xc1, 0xfa, 0xb5, 0xf8, 0x6f,
+	0x94, 0xc4, 0x8a, 0xf4, 0xc6, 0x28, 0x6e, 0x1f, 0x2f, 0xd9, 0xd5, 0xab, 0x4f, 0x51, 0x9e, 0x8e,
+	0x80, 0x57, 0xae, 0x55, 0x3f, 0x52, 0xe0, 0x6c, 0x6a, 0x39, 0x85, 0x5e, 0x1e, 0xc1, 0x29, 0x93,
+	0x0a, 0x30, 0xf5, 0xa5, 0xa7, 0x2b, 0x67, 0x86, 0x5c, 0xc8, 0xb2, 0xad, 0x43, 0xf8, 0x5c, 0x28,
+	0xee, 0x60, 0x12, 0x4a, 0xfc, 0xd3, 0x5c, 0xf3, 0xc2, 0x08, 0x05, 0xc0, 0x90, 0xcb, 0x97, 0x57,
+	0x04, 0x34, 0x51, 0x29, 0xf1, 0xdb, 0x2f, 0x08, 0x40, 0x77, 0xad, 0xa6, 0x8d, 0x2e, 0x0f, 0x5b,
+	0xb4, 0xff, 0x4f, 0x66, 0xea, 0xf3, 0xc3, 0x58, 0xa9, 0x40, 0xed, 0x1a, 0x83, 0xb3, 0x86, 0xae,
+	0x26, 0xc2, 0x91, 0xac, 0x62, 0x5a, 0x4d, 0x5b, 0xdc, 0x8f, 0xab, 0xca, 0xba, 0x82, 0xde, 0x53,
+	0xbc, 0xd2, 0x63, 0xd3, 0x2f, 0xdf, 0x79, 0x09, 0x82, 0x56, 0x06, 0xe6, 0x48, 0x01, 0xa3, 0x9a,
+	0x96, 0x7b, 0x25, 0x97, 0x34, 0xda, 0x0d, 0x86, 0x75, 0x1d, 0x55, 0x13, 0xb1, 0xba, 0x82, 0xdd,
+	0xad, 0x79, 0xfd, 0x84, 0x9a, 0xcb, 0xe4, 0x48, 0x50, 0x77, 0xfd, 0x1e, 0xc2, 0x10, 0xa8, 0x51,
+	0xc6, 0xff, 0x15, 0x54, 0xaf, 0xa9, 0x21, 0xa0, 0x6e, 0xfd, 0x42, 0xf9, 0xe3, 0x27, 0x4b, 0xca,
+	0x9f, 0x3f, 0x59, 0x52, 0xfe, 0xfe, 0xc9, 0x92, 0x02, 0x67, 0x6d, 0xa7, 0x95, 0xac, 0x78, 0x6b,
+	0x46, 0xaa, 0xad, 0x76, 0xa9, 0x1f, 0xee, 0x2a, 0xdf, 0xb8, 0x21, 0xfd, 0x47, 0x65, 0xcf, 0x39,
+	0x76, 0xbb, 0x06, 0x31, 0x1b, 0x1d, 0xe3, 0xc0, 0xad, 0x79, 0x32, 0x8c, 0x9e, 0xe9, 0x86, 0x20,
+	0x7d, 0x01, 0x93, 0xf6, 0xaf, 0x32, 0xf3, 0xdb, 0x9e, 0x8e, 0x6d, 0x49, 0xc7, 0x9f, 0x02, 0xfa,
+	0x83, 0x6d, 0xd2, 0x7e, 0xe0, 0xd1, 0x0f, 0x26, 0x98, 0xe3, 0x5f, 0xfb, 0x6f, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x69, 0x53, 0x82, 0xbf, 0xfa, 0x29, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -3990,6 +3378,77 @@ type BeaconChainServer interface {
 	StreamValidatorsInfo(BeaconChain_StreamValidatorsInfoServer) error
 	SubmitAttesterSlashing(context.Context, *AttesterSlashing) (*SubmitSlashingResponse, error)
 	SubmitProposerSlashing(context.Context, *ProposerSlashing) (*SubmitSlashingResponse, error)
+}
+
+// UnimplementedBeaconChainServer can be embedded to have forward compatible implementations.
+type UnimplementedBeaconChainServer struct {
+}
+
+func (*UnimplementedBeaconChainServer) ListAttestations(ctx context.Context, req *ListAttestationsRequest) (*ListAttestationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAttestations not implemented")
+}
+func (*UnimplementedBeaconChainServer) ListIndexedAttestations(ctx context.Context, req *ListIndexedAttestationsRequest) (*ListIndexedAttestationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListIndexedAttestations not implemented")
+}
+func (*UnimplementedBeaconChainServer) StreamAttestations(req *types.Empty, srv BeaconChain_StreamAttestationsServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamAttestations not implemented")
+}
+func (*UnimplementedBeaconChainServer) StreamIndexedAttestations(req *types.Empty, srv BeaconChain_StreamIndexedAttestationsServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamIndexedAttestations not implemented")
+}
+func (*UnimplementedBeaconChainServer) AttestationPool(ctx context.Context, req *AttestationPoolRequest) (*AttestationPoolResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AttestationPool not implemented")
+}
+func (*UnimplementedBeaconChainServer) ListBlocks(ctx context.Context, req *ListBlocksRequest) (*ListBlocksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListBlocks not implemented")
+}
+func (*UnimplementedBeaconChainServer) StreamBlocks(req *types.Empty, srv BeaconChain_StreamBlocksServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamBlocks not implemented")
+}
+func (*UnimplementedBeaconChainServer) StreamChainHead(req *types.Empty, srv BeaconChain_StreamChainHeadServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamChainHead not implemented")
+}
+func (*UnimplementedBeaconChainServer) GetChainHead(ctx context.Context, req *types.Empty) (*ChainHead, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChainHead not implemented")
+}
+func (*UnimplementedBeaconChainServer) ListBeaconCommittees(ctx context.Context, req *ListCommitteesRequest) (*BeaconCommittees, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListBeaconCommittees not implemented")
+}
+func (*UnimplementedBeaconChainServer) ListValidatorBalances(ctx context.Context, req *ListValidatorBalancesRequest) (*ValidatorBalances, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListValidatorBalances not implemented")
+}
+func (*UnimplementedBeaconChainServer) ListValidators(ctx context.Context, req *ListValidatorsRequest) (*Validators, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListValidators not implemented")
+}
+func (*UnimplementedBeaconChainServer) GetValidator(ctx context.Context, req *GetValidatorRequest) (*Validator, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetValidator not implemented")
+}
+func (*UnimplementedBeaconChainServer) GetValidatorActiveSetChanges(ctx context.Context, req *GetValidatorActiveSetChangesRequest) (*ActiveSetChanges, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetValidatorActiveSetChanges not implemented")
+}
+func (*UnimplementedBeaconChainServer) GetValidatorQueue(ctx context.Context, req *types.Empty) (*ValidatorQueue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetValidatorQueue not implemented")
+}
+func (*UnimplementedBeaconChainServer) GetValidatorPerformance(ctx context.Context, req *ValidatorPerformanceRequest) (*ValidatorPerformanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetValidatorPerformance not implemented")
+}
+func (*UnimplementedBeaconChainServer) ListValidatorAssignments(ctx context.Context, req *ListValidatorAssignmentsRequest) (*ValidatorAssignments, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListValidatorAssignments not implemented")
+}
+func (*UnimplementedBeaconChainServer) GetValidatorParticipation(ctx context.Context, req *GetValidatorParticipationRequest) (*ValidatorParticipationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetValidatorParticipation not implemented")
+}
+func (*UnimplementedBeaconChainServer) GetBeaconConfig(ctx context.Context, req *types.Empty) (*BeaconConfig, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconConfig not implemented")
+}
+func (*UnimplementedBeaconChainServer) StreamValidatorsInfo(srv BeaconChain_StreamValidatorsInfoServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamValidatorsInfo not implemented")
+}
+func (*UnimplementedBeaconChainServer) SubmitAttesterSlashing(ctx context.Context, req *AttesterSlashing) (*SubmitSlashingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitAttesterSlashing not implemented")
+}
+func (*UnimplementedBeaconChainServer) SubmitProposerSlashing(ctx context.Context, req *ProposerSlashing) (*SubmitSlashingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitProposerSlashing not implemented")
 }
 
 func RegisterBeaconChainServer(s *grpc.Server, srv BeaconChainServer) {
@@ -4519,7 +3978,7 @@ var _BeaconChain_serviceDesc = grpc.ServiceDesc{
 func (m *ValidatorChangeSet) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4527,33 +3986,40 @@ func (m *ValidatorChangeSet) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ValidatorChangeSet) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorChangeSet) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Action != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Action))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.PublicKeys) > 0 {
-		for _, b := range m.PublicKeys {
+		for iNdEx := len(m.PublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PublicKeys[iNdEx])
+			copy(dAtA[i:], m.PublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKeys[iNdEx])))
+			i--
 			dAtA[i] = 0x12
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.Action != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Action))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ListIndexedAttestationsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4561,57 +4027,76 @@ func (m *ListIndexedAttestationsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListIndexedAttestationsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListIndexedAttestationsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.QueryFilter != nil {
-		nn1, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn1
-	}
-	if m.PageSize != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.PageToken) > 0 {
-		dAtA[i] = 0x22
-		i++
+		i -= len(m.PageToken)
+		copy(dAtA[i:], m.PageToken)
 		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
-		i += copy(dAtA[i:], m.PageToken)
+		i--
+		dAtA[i] = 0x22
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.PageSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.QueryFilter != nil {
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListIndexedAttestationsRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListIndexedAttestationsRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
 }
 func (m *ListIndexedAttestationsRequest_GenesisEpoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListIndexedAttestationsRequest_GenesisEpoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
 	if m.GenesisEpoch {
 		dAtA[i] = 1
 	} else {
 		dAtA[i] = 0
 	}
-	i++
-	return i, nil
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
 }
 func (m *ListAttestationsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4619,57 +4104,76 @@ func (m *ListAttestationsRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListAttestationsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListAttestationsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.QueryFilter != nil {
-		nn2, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn2
-	}
-	if m.PageSize != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.PageToken) > 0 {
-		dAtA[i] = 0x22
-		i++
+		i -= len(m.PageToken)
+		copy(dAtA[i:], m.PageToken)
 		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
-		i += copy(dAtA[i:], m.PageToken)
+		i--
+		dAtA[i] = 0x22
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.PageSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.QueryFilter != nil {
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListAttestationsRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListAttestationsRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
 }
 func (m *ListAttestationsRequest_GenesisEpoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListAttestationsRequest_GenesisEpoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
 	if m.GenesisEpoch {
 		dAtA[i] = 1
 	} else {
 		dAtA[i] = 0
 	}
-	i++
-	return i, nil
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
 }
 func (m *ListAttestationsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4677,43 +4181,52 @@ func (m *ListAttestationsResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListAttestationsResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListAttestationsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Attestations) > 0 {
-		for _, msg := range m.Attestations {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.NextPageToken) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
-		i += copy(dAtA[i:], m.NextPageToken)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if m.TotalSize != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.NextPageToken) > 0 {
+		i -= len(m.NextPageToken)
+		copy(dAtA[i:], m.NextPageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.Attestations) > 0 {
+		for iNdEx := len(m.Attestations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Attestations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListIndexedAttestationsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4721,43 +4234,52 @@ func (m *ListIndexedAttestationsResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListIndexedAttestationsResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListIndexedAttestationsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.IndexedAttestations) > 0 {
-		for _, msg := range m.IndexedAttestations {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.NextPageToken) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
-		i += copy(dAtA[i:], m.NextPageToken)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if m.TotalSize != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.NextPageToken) > 0 {
+		i -= len(m.NextPageToken)
+		copy(dAtA[i:], m.NextPageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.IndexedAttestations) > 0 {
+		for iNdEx := len(m.IndexedAttestations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.IndexedAttestations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListBlocksRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4765,74 +4287,104 @@ func (m *ListBlocksRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListBlocksRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListBlocksRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.QueryFilter != nil {
-		nn3, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn3
-	}
-	if m.PageSize != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.PageToken) > 0 {
-		dAtA[i] = 0x32
-		i++
+		i -= len(m.PageToken)
+		copy(dAtA[i:], m.PageToken)
 		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
-		i += copy(dAtA[i:], m.PageToken)
+		i--
+		dAtA[i] = 0x32
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.PageSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+		i--
+		dAtA[i] = 0x28
 	}
-	return i, nil
+	if m.QueryFilter != nil {
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListBlocksRequest_Root) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListBlocksRequest_Root) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Root != nil {
-		dAtA[i] = 0xa
-		i++
+		i -= len(m.Root)
+		copy(dAtA[i:], m.Root)
 		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.Root)))
-		i += copy(dAtA[i:], m.Root)
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *ListBlocksRequest_Slot) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListBlocksRequest_Slot) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Slot))
-	return i, nil
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
 }
 func (m *ListBlocksRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x18
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListBlocksRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
+	i--
+	dAtA[i] = 0x18
+	return len(dAtA) - i, nil
 }
 func (m *ListBlocksRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x20
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListBlocksRequest_Genesis) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
 	if m.Genesis {
 		dAtA[i] = 1
 	} else {
 		dAtA[i] = 0
 	}
-	i++
-	return i, nil
+	i--
+	dAtA[i] = 0x20
+	return len(dAtA) - i, nil
 }
 func (m *ListBlocksResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4840,43 +4392,52 @@ func (m *ListBlocksResponse) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListBlocksResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListBlocksResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.BlockContainers) > 0 {
-		for _, msg := range m.BlockContainers {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.NextPageToken) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
-		i += copy(dAtA[i:], m.NextPageToken)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if m.TotalSize != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.NextPageToken) > 0 {
+		i -= len(m.NextPageToken)
+		copy(dAtA[i:], m.NextPageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if len(m.BlockContainers) > 0 {
+		for iNdEx := len(m.BlockContainers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.BlockContainers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *BeaconBlockContainer) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4884,36 +4445,45 @@ func (m *BeaconBlockContainer) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *BeaconBlockContainer) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BeaconBlockContainer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Block != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Block.Size()))
-		n4, err := m.Block.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.BlockRoot) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.BlockRoot)
+		copy(dAtA[i:], m.BlockRoot)
 		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.BlockRoot)))
-		i += copy(dAtA[i:], m.BlockRoot)
+		i--
+		dAtA[i] = 0x12
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.Block != nil {
+		{
+			size, err := m.Block.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ChainHead) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -4921,84 +4491,94 @@ func (m *ChainHead) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ChainHead) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ChainHead) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.HeadSlot != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.HeadSlot))
-	}
-	if m.HeadEpoch != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.HeadEpoch))
-	}
-	if len(m.HeadBlockRoot) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.HeadBlockRoot)))
-		i += copy(dAtA[i:], m.HeadBlockRoot)
-	}
-	if m.FinalizedSlot != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.FinalizedSlot))
-	}
-	if m.FinalizedEpoch != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.FinalizedEpoch))
-	}
-	if len(m.FinalizedBlockRoot) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.FinalizedBlockRoot)))
-		i += copy(dAtA[i:], m.FinalizedBlockRoot)
-	}
-	if m.JustifiedSlot != 0 {
-		dAtA[i] = 0x38
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.JustifiedSlot))
-	}
-	if m.JustifiedEpoch != 0 {
-		dAtA[i] = 0x40
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.JustifiedEpoch))
-	}
-	if len(m.JustifiedBlockRoot) > 0 {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.JustifiedBlockRoot)))
-		i += copy(dAtA[i:], m.JustifiedBlockRoot)
-	}
-	if m.PreviousJustifiedSlot != 0 {
-		dAtA[i] = 0x50
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PreviousJustifiedSlot))
-	}
-	if m.PreviousJustifiedEpoch != 0 {
-		dAtA[i] = 0x58
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PreviousJustifiedEpoch))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.PreviousJustifiedBlockRoot) > 0 {
-		dAtA[i] = 0x62
-		i++
+		i -= len(m.PreviousJustifiedBlockRoot)
+		copy(dAtA[i:], m.PreviousJustifiedBlockRoot)
 		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PreviousJustifiedBlockRoot)))
-		i += copy(dAtA[i:], m.PreviousJustifiedBlockRoot)
+		i--
+		dAtA[i] = 0x62
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.PreviousJustifiedEpoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PreviousJustifiedEpoch))
+		i--
+		dAtA[i] = 0x58
 	}
-	return i, nil
+	if m.PreviousJustifiedSlot != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PreviousJustifiedSlot))
+		i--
+		dAtA[i] = 0x50
+	}
+	if len(m.JustifiedBlockRoot) > 0 {
+		i -= len(m.JustifiedBlockRoot)
+		copy(dAtA[i:], m.JustifiedBlockRoot)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.JustifiedBlockRoot)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.JustifiedEpoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.JustifiedEpoch))
+		i--
+		dAtA[i] = 0x40
+	}
+	if m.JustifiedSlot != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.JustifiedSlot))
+		i--
+		dAtA[i] = 0x38
+	}
+	if len(m.FinalizedBlockRoot) > 0 {
+		i -= len(m.FinalizedBlockRoot)
+		copy(dAtA[i:], m.FinalizedBlockRoot)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.FinalizedBlockRoot)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.FinalizedEpoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.FinalizedEpoch))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.FinalizedSlot != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.FinalizedSlot))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.HeadBlockRoot) > 0 {
+		i -= len(m.HeadBlockRoot)
+		copy(dAtA[i:], m.HeadBlockRoot)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.HeadBlockRoot)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.HeadEpoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.HeadEpoch))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.HeadSlot != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.HeadSlot))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListCommitteesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5006,46 +4586,64 @@ func (m *ListCommitteesRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ListCommitteesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListCommitteesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.QueryFilter != nil {
-		nn5, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn5
-	}
 	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	return i, nil
+	if m.QueryFilter != nil {
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ListCommitteesRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListCommitteesRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
 }
 func (m *ListCommitteesRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListCommitteesRequest_Genesis) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
 	if m.Genesis {
 		dAtA[i] = 1
 	} else {
 		dAtA[i] = 0
 	}
-	i++
-	return i, nil
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
 }
 func (m *BeaconCommittees) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5053,57 +4651,60 @@ func (m *BeaconCommittees) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *BeaconCommittees) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BeaconCommittees) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Epoch != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	}
-	if len(m.Committees) > 0 {
-		for k, _ := range m.Committees {
-			dAtA[i] = 0x12
-			i++
-			v := m.Committees[k]
-			msgSize := 0
-			if v != nil {
-				msgSize = v.Size()
-				msgSize += 1 + sovBeaconChain(uint64(msgSize))
-			}
-			mapSize := 1 + sovBeaconChain(uint64(k)) + msgSize
-			i = encodeVarintBeaconChain(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0x8
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(k))
-			if v != nil {
-				dAtA[i] = 0x12
-				i++
-				i = encodeVarintBeaconChain(dAtA, i, uint64(v.Size()))
-				n6, err := v.MarshalTo(dAtA[i:])
-				if err != nil {
-					return 0, err
-				}
-				i += n6
-			}
-		}
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if m.ActiveValidatorCount != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintBeaconChain(dAtA, i, uint64(m.ActiveValidatorCount))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.Committees) > 0 {
+		for k := range m.Committees {
+			v := m.Committees[k]
+			baseI := i
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+				}
+				i--
+				dAtA[i] = 0x12
+			}
+			i = encodeVarintBeaconChain(dAtA, i, uint64(k))
+			i--
+			dAtA[i] = 0x8
+			i = encodeVarintBeaconChain(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x12
+		}
 	}
-	return i, nil
+	if m.Epoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *BeaconCommittees_CommitteeItem) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -5111,14 +4712,315 @@ func (m *BeaconCommittees_CommitteeItem) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *BeaconCommittees_CommitteeItem) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BeaconCommittees_CommitteeItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
 	if len(m.ValidatorIndices) > 0 {
-		dAtA8 := make([]byte, len(m.ValidatorIndices)*10)
-		var j7 int
+		dAtA4 := make([]byte, len(m.ValidatorIndices)*10)
+		var j3 int
 		for _, num := range m.ValidatorIndices {
+			for num >= 1<<7 {
+				dAtA4[j3] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j3++
+			}
+			dAtA4[j3] = uint8(num)
+			j3++
+		}
+		i -= j3
+		copy(dAtA[i:], dAtA4[:j3])
+		i = encodeVarintBeaconChain(dAtA, i, uint64(j3))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *BeaconCommittees_CommitteesList) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BeaconCommittees_CommitteesList) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BeaconCommittees_CommitteesList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Committees) > 0 {
+		for iNdEx := len(m.Committees) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Committees[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListValidatorBalancesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListValidatorBalancesRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorBalancesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.PageToken) > 0 {
+		i -= len(m.PageToken)
+		copy(dAtA[i:], m.PageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.PageSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.Indices) > 0 {
+		dAtA6 := make([]byte, len(m.Indices)*10)
+		var j5 int
+		for _, num := range m.Indices {
+			for num >= 1<<7 {
+				dAtA6[j5] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j5++
+			}
+			dAtA6[j5] = uint8(num)
+			j5++
+		}
+		i -= j5
+		copy(dAtA[i:], dAtA6[:j5])
+		i = encodeVarintBeaconChain(dAtA, i, uint64(j5))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.PublicKeys) > 0 {
+		for iNdEx := len(m.PublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PublicKeys[iNdEx])
+			copy(dAtA[i:], m.PublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if m.QueryFilter != nil {
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListValidatorBalancesRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorBalancesRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+func (m *ListValidatorBalancesRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorBalancesRequest_Genesis) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.Genesis {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
+}
+func (m *ValidatorBalances) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ValidatorBalances) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorBalances) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.TotalSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.NextPageToken) > 0 {
+		i -= len(m.NextPageToken)
+		copy(dAtA[i:], m.NextPageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Balances) > 0 {
+		for iNdEx := len(m.Balances) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Balances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if m.Epoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ValidatorBalances_Balance) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ValidatorBalances_Balance) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorBalances_Balance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.Balance != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Balance))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.Index != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Index))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.PublicKey) > 0 {
+		i -= len(m.PublicKey)
+		copy(dAtA[i:], m.PublicKey)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKey)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListValidatorsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListValidatorsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Indices) > 0 {
+		dAtA8 := make([]byte, len(m.Indices)*10)
+		var j7 int
+		for _, num := range m.Indices {
 			for num >= 1<<7 {
 				dAtA8[j7] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5127,84 +5029,343 @@ func (m *BeaconCommittees_CommitteeItem) MarshalTo(dAtA []byte) (int, error) {
 			dAtA8[j7] = uint8(num)
 			j7++
 		}
-		dAtA[i] = 0xa
-		i++
+		i -= j7
+		copy(dAtA[i:], dAtA8[:j7])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j7))
-		i += copy(dAtA[i:], dAtA8[:j7])
+		i--
+		dAtA[i] = 0x3a
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.PublicKeys) > 0 {
+		for iNdEx := len(m.PublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PublicKeys[iNdEx])
+			copy(dAtA[i:], m.PublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x32
+		}
 	}
-	return i, nil
+	if len(m.PageToken) > 0 {
+		i -= len(m.PageToken)
+		copy(dAtA[i:], m.PageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.PageSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Active {
+		i--
+		if m.Active {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.QueryFilter != nil {
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
-func (m *BeaconCommittees_CommitteesList) Marshal() (dAtA []byte, err error) {
+func (m *ListValidatorsRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorsRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+func (m *ListValidatorsRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorsRequest_Genesis) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.Genesis {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
+}
+func (m *GetValidatorRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
 	return dAtA[:n], nil
 }
 
-func (m *BeaconCommittees_CommitteesList) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+func (m *GetValidatorRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Committees) > 0 {
-		for _, msg := range m.Committees {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.QueryFilter != nil {
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GetValidatorRequest_Index) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorRequest_Index) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Index))
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+func (m *GetValidatorRequest_PublicKey) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorRequest_PublicKey) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.PublicKey != nil {
+		i -= len(m.PublicKey)
+		copy(dAtA[i:], m.PublicKey)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKey)))
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Validators) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Validators) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Validators) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.TotalSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.NextPageToken) > 0 {
+		i -= len(m.NextPageToken)
+		copy(dAtA[i:], m.NextPageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ValidatorList) > 0 {
+		for iNdEx := len(m.ValidatorList) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ValidatorList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if m.Epoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Validators_ValidatorContainer) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Validators_ValidatorContainer) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Validators_ValidatorContainer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.Validator != nil {
+		{
+			size, err := m.Validator.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintBeaconChain(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x12
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.Index != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Index))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
-func (m *ListValidatorBalancesRequest) Marshal() (dAtA []byte, err error) {
+func (m *GetValidatorActiveSetChangesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
 	return dAtA[:n], nil
 }
 
-func (m *ListValidatorBalancesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+func (m *GetValidatorActiveSetChangesRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorActiveSetChangesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
 	if m.QueryFilter != nil {
-		nn9, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn9
-	}
-	if len(m.PublicKeys) > 0 {
-		for _, b := range m.PublicKeys {
-			dAtA[i] = 0x1a
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
 	}
-	if len(m.Indices) > 0 {
-		dAtA11 := make([]byte, len(m.Indices)*10)
+	return len(dAtA) - i, nil
+}
+
+func (m *GetValidatorActiveSetChangesRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorActiveSetChangesRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+func (m *GetValidatorActiveSetChangesRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorActiveSetChangesRequest_Genesis) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.Genesis {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
+}
+func (m *ActiveSetChanges) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ActiveSetChanges) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ActiveSetChanges) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.EjectedIndices) > 0 {
+		dAtA11 := make([]byte, len(m.EjectedIndices)*10)
 		var j10 int
-		for _, num := range m.Indices {
+		for _, num := range m.EjectedIndices {
 			for num >= 1<<7 {
 				dAtA11[j10] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5213,435 +5374,138 @@ func (m *ListValidatorBalancesRequest) MarshalTo(dAtA []byte) (int, error) {
 			dAtA11[j10] = uint8(num)
 			j10++
 		}
-		dAtA[i] = 0x22
-		i++
+		i -= j10
+		copy(dAtA[i:], dAtA11[:j10])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j10))
-		i += copy(dAtA[i:], dAtA11[:j10])
+		i--
+		dAtA[i] = 0x4a
 	}
-	if m.PageSize != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
-	}
-	if len(m.PageToken) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
-		i += copy(dAtA[i:], m.PageToken)
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *ListValidatorBalancesRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
-	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
-}
-func (m *ListValidatorBalancesRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
-	if m.Genesis {
-		dAtA[i] = 1
-	} else {
-		dAtA[i] = 0
-	}
-	i++
-	return i, nil
-}
-func (m *ValidatorBalances) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatorBalances) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Epoch != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	}
-	if len(m.Balances) > 0 {
-		for _, msg := range m.Balances {
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
+	if len(m.EjectedPublicKeys) > 0 {
+		for iNdEx := len(m.EjectedPublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.EjectedPublicKeys[iNdEx])
+			copy(dAtA[i:], m.EjectedPublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.EjectedPublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x42
 		}
 	}
-	if len(m.NextPageToken) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
-		i += copy(dAtA[i:], m.NextPageToken)
-	}
-	if m.TotalSize != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *ValidatorBalances_Balance) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatorBalances_Balance) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.PublicKey) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKey)))
-		i += copy(dAtA[i:], m.PublicKey)
-	}
-	if m.Index != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Index))
-	}
-	if m.Balance != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Balance))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *ListValidatorsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListValidatorsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.QueryFilter != nil {
-		nn12, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn12
-	}
-	if m.Active {
-		dAtA[i] = 0x18
-		i++
-		if m.Active {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.PageSize != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
-	}
-	if len(m.PageToken) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
-		i += copy(dAtA[i:], m.PageToken)
-	}
-	if len(m.PublicKeys) > 0 {
-		for _, b := range m.PublicKeys {
-			dAtA[i] = 0x32
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
-		}
-	}
-	if len(m.Indices) > 0 {
-		dAtA14 := make([]byte, len(m.Indices)*10)
-		var j13 int
-		for _, num := range m.Indices {
+	if len(m.SlashedIndices) > 0 {
+		dAtA13 := make([]byte, len(m.SlashedIndices)*10)
+		var j12 int
+		for _, num := range m.SlashedIndices {
 			for num >= 1<<7 {
-				dAtA14[j13] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA13[j12] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j13++
+				j12++
 			}
-			dAtA14[j13] = uint8(num)
-			j13++
+			dAtA13[j12] = uint8(num)
+			j12++
 		}
+		i -= j12
+		copy(dAtA[i:], dAtA13[:j12])
+		i = encodeVarintBeaconChain(dAtA, i, uint64(j12))
+		i--
 		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(j13))
-		i += copy(dAtA[i:], dAtA14[:j13])
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *ListValidatorsRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
-	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
-}
-func (m *ListValidatorsRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
-	if m.Genesis {
-		dAtA[i] = 1
-	} else {
-		dAtA[i] = 0
-	}
-	i++
-	return i, nil
-}
-func (m *GetValidatorRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetValidatorRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.QueryFilter != nil {
-		nn15, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+	if len(m.SlashedPublicKeys) > 0 {
+		for iNdEx := len(m.SlashedPublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.SlashedPublicKeys[iNdEx])
+			copy(dAtA[i:], m.SlashedPublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.SlashedPublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x32
 		}
-		i += nn15
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *GetValidatorRequest_Index) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
-	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Index))
-	return i, nil
-}
-func (m *GetValidatorRequest_PublicKey) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	if m.PublicKey != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKey)))
-		i += copy(dAtA[i:], m.PublicKey)
-	}
-	return i, nil
-}
-func (m *Validators) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Validators) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Epoch != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	}
-	if len(m.ValidatorList) > 0 {
-		for _, msg := range m.ValidatorList {
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+	if len(m.ExitedIndices) > 0 {
+		dAtA15 := make([]byte, len(m.ExitedIndices)*10)
+		var j14 int
+		for _, num := range m.ExitedIndices {
+			for num >= 1<<7 {
+				dAtA15[j14] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j14++
 			}
-			i += n
+			dAtA15[j14] = uint8(num)
+			j14++
 		}
+		i -= j14
+		copy(dAtA[i:], dAtA15[:j14])
+		i = encodeVarintBeaconChain(dAtA, i, uint64(j14))
+		i--
+		dAtA[i] = 0x2a
 	}
-	if len(m.NextPageToken) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
-		i += copy(dAtA[i:], m.NextPageToken)
-	}
-	if m.TotalSize != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *Validators_ValidatorContainer) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Validators_ValidatorContainer) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Index != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Index))
-	}
-	if m.Validator != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Validator.Size()))
-		n16, err := m.Validator.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n16
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *GetValidatorActiveSetChangesRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetValidatorActiveSetChangesRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.QueryFilter != nil {
-		nn17, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn17
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *GetValidatorActiveSetChangesRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
-	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
-}
-func (m *GetValidatorActiveSetChangesRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
-	if m.Genesis {
-		dAtA[i] = 1
-	} else {
-		dAtA[i] = 0
-	}
-	i++
-	return i, nil
-}
-func (m *ActiveSetChanges) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ActiveSetChanges) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Epoch != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	}
-	if len(m.ActivatedPublicKeys) > 0 {
-		for _, b := range m.ActivatedPublicKeys {
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
+	if len(m.ExitedPublicKeys) > 0 {
+		for iNdEx := len(m.ExitedPublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ExitedPublicKeys[iNdEx])
+			copy(dAtA[i:], m.ExitedPublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.ExitedPublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x22
 		}
 	}
 	if len(m.ActivatedIndices) > 0 {
-		dAtA19 := make([]byte, len(m.ActivatedIndices)*10)
-		var j18 int
+		dAtA17 := make([]byte, len(m.ActivatedIndices)*10)
+		var j16 int
 		for _, num := range m.ActivatedIndices {
+			for num >= 1<<7 {
+				dAtA17[j16] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j16++
+			}
+			dAtA17[j16] = uint8(num)
+			j16++
+		}
+		i -= j16
+		copy(dAtA[i:], dAtA17[:j16])
+		i = encodeVarintBeaconChain(dAtA, i, uint64(j16))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ActivatedPublicKeys) > 0 {
+		for iNdEx := len(m.ActivatedPublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ActivatedPublicKeys[iNdEx])
+			copy(dAtA[i:], m.ActivatedPublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.ActivatedPublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if m.Epoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ValidatorPerformanceRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ValidatorPerformanceRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorPerformanceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Indices) > 0 {
+		dAtA19 := make([]byte, len(m.Indices)*10)
+		var j18 int
+		for _, num := range m.Indices {
 			for num >= 1<<7 {
 				dAtA19[j18] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5650,23 +5514,67 @@ func (m *ActiveSetChanges) MarshalTo(dAtA []byte) (int, error) {
 			dAtA19[j18] = uint8(num)
 			j18++
 		}
-		dAtA[i] = 0x1a
-		i++
+		i -= j18
+		copy(dAtA[i:], dAtA19[:j18])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j18))
-		i += copy(dAtA[i:], dAtA19[:j18])
+		i--
+		dAtA[i] = 0x12
 	}
-	if len(m.ExitedPublicKeys) > 0 {
-		for _, b := range m.ExitedPublicKeys {
-			dAtA[i] = 0x22
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
+	if len(m.PublicKeys) > 0 {
+		for iNdEx := len(m.PublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PublicKeys[iNdEx])
+			copy(dAtA[i:], m.PublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	if len(m.ExitedIndices) > 0 {
-		dAtA21 := make([]byte, len(m.ExitedIndices)*10)
+	return len(dAtA) - i, nil
+}
+
+func (m *ValidatorPerformanceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ValidatorPerformanceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorPerformanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.AverageActiveValidatorBalance != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.AverageActiveValidatorBalance))))
+		i--
+		dAtA[i] = 0x55
+	}
+	if len(m.MissingValidators) > 0 {
+		for iNdEx := len(m.MissingValidators) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.MissingValidators[iNdEx])
+			copy(dAtA[i:], m.MissingValidators[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.MissingValidators[iNdEx])))
+			i--
+			dAtA[i] = 0x4a
+		}
+	}
+	if len(m.BalancesAfterEpochTransition) > 0 {
+		dAtA21 := make([]byte, len(m.BalancesAfterEpochTransition)*10)
 		var j20 int
-		for _, num := range m.ExitedIndices {
+		for _, num := range m.BalancesAfterEpochTransition {
 			for num >= 1<<7 {
 				dAtA21[j20] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5675,23 +5583,16 @@ func (m *ActiveSetChanges) MarshalTo(dAtA []byte) (int, error) {
 			dAtA21[j20] = uint8(num)
 			j20++
 		}
-		dAtA[i] = 0x2a
-		i++
+		i -= j20
+		copy(dAtA[i:], dAtA21[:j20])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j20))
-		i += copy(dAtA[i:], dAtA21[:j20])
+		i--
+		dAtA[i] = 0x42
 	}
-	if len(m.SlashedPublicKeys) > 0 {
-		for _, b := range m.SlashedPublicKeys {
-			dAtA[i] = 0x32
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
-		}
-	}
-	if len(m.SlashedIndices) > 0 {
-		dAtA23 := make([]byte, len(m.SlashedIndices)*10)
+	if len(m.BalancesBeforeEpochTransition) > 0 {
+		dAtA23 := make([]byte, len(m.BalancesBeforeEpochTransition)*10)
 		var j22 int
-		for _, num := range m.SlashedIndices {
+		for _, num := range m.BalancesBeforeEpochTransition {
 			for num >= 1<<7 {
 				dAtA23[j22] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5700,23 +5601,55 @@ func (m *ActiveSetChanges) MarshalTo(dAtA []byte) (int, error) {
 			dAtA23[j22] = uint8(num)
 			j22++
 		}
-		dAtA[i] = 0x3a
-		i++
+		i -= j22
+		copy(dAtA[i:], dAtA23[:j22])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j22))
-		i += copy(dAtA[i:], dAtA23[:j22])
+		i--
+		dAtA[i] = 0x3a
 	}
-	if len(m.EjectedPublicKeys) > 0 {
-		for _, b := range m.EjectedPublicKeys {
-			dAtA[i] = 0x42
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
+	if len(m.CorrectlyVotedHead) > 0 {
+		for iNdEx := len(m.CorrectlyVotedHead) - 1; iNdEx >= 0; iNdEx-- {
+			i--
+			if m.CorrectlyVotedHead[iNdEx] {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
 		}
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.CorrectlyVotedHead)))
+		i--
+		dAtA[i] = 0x32
 	}
-	if len(m.EjectedIndices) > 0 {
-		dAtA25 := make([]byte, len(m.EjectedIndices)*10)
+	if len(m.CorrectlyVotedTarget) > 0 {
+		for iNdEx := len(m.CorrectlyVotedTarget) - 1; iNdEx >= 0; iNdEx-- {
+			i--
+			if m.CorrectlyVotedTarget[iNdEx] {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+		}
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.CorrectlyVotedTarget)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.CorrectlyVotedSource) > 0 {
+		for iNdEx := len(m.CorrectlyVotedSource) - 1; iNdEx >= 0; iNdEx-- {
+			i--
+			if m.CorrectlyVotedSource[iNdEx] {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+		}
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.CorrectlyVotedSource)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.InclusionDistances) > 0 {
+		dAtA25 := make([]byte, len(m.InclusionDistances)*10)
 		var j24 int
-		for _, num := range m.EjectedIndices {
+		for _, num := range m.InclusionDistances {
 			for num >= 1<<7 {
 				dAtA25[j24] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5725,65 +5658,16 @@ func (m *ActiveSetChanges) MarshalTo(dAtA []byte) (int, error) {
 			dAtA25[j24] = uint8(num)
 			j24++
 		}
-		dAtA[i] = 0x4a
-		i++
+		i -= j24
+		copy(dAtA[i:], dAtA25[:j24])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j24))
-		i += copy(dAtA[i:], dAtA25[:j24])
+		i--
+		dAtA[i] = 0x1a
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *ValidatorPerformanceRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatorPerformanceRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.PublicKeys) > 0 {
-		for _, b := range m.PublicKeys {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
-		}
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *ValidatorPerformanceResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatorPerformanceResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.CurrentEffectiveBalances) > 0 {
-		dAtA27 := make([]byte, len(m.CurrentEffectiveBalances)*10)
+	if len(m.InclusionSlots) > 0 {
+		dAtA27 := make([]byte, len(m.InclusionSlots)*10)
 		var j26 int
-		for _, num := range m.CurrentEffectiveBalances {
+		for _, num := range m.InclusionSlots {
 			for num >= 1<<7 {
 				dAtA27[j26] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5792,15 +5676,16 @@ func (m *ValidatorPerformanceResponse) MarshalTo(dAtA []byte) (int, error) {
 			dAtA27[j26] = uint8(num)
 			j26++
 		}
-		dAtA[i] = 0xa
-		i++
+		i -= j26
+		copy(dAtA[i:], dAtA27[:j26])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j26))
-		i += copy(dAtA[i:], dAtA27[:j26])
+		i--
+		dAtA[i] = 0x12
 	}
-	if len(m.InclusionSlots) > 0 {
-		dAtA29 := make([]byte, len(m.InclusionSlots)*10)
+	if len(m.CurrentEffectiveBalances) > 0 {
+		dAtA29 := make([]byte, len(m.CurrentEffectiveBalances)*10)
 		var j28 int
-		for _, num := range m.InclusionSlots {
+		for _, num := range m.CurrentEffectiveBalances {
 			for num >= 1<<7 {
 				dAtA29[j28] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5809,15 +5694,43 @@ func (m *ValidatorPerformanceResponse) MarshalTo(dAtA []byte) (int, error) {
 			dAtA29[j28] = uint8(num)
 			j28++
 		}
-		dAtA[i] = 0x12
-		i++
+		i -= j28
+		copy(dAtA[i:], dAtA29[:j28])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j28))
-		i += copy(dAtA[i:], dAtA29[:j28])
+		i--
+		dAtA[i] = 0xa
 	}
-	if len(m.InclusionDistances) > 0 {
-		dAtA31 := make([]byte, len(m.InclusionDistances)*10)
+	return len(dAtA) - i, nil
+}
+
+func (m *ValidatorQueue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ValidatorQueue) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorQueue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.ExitValidatorIndices) > 0 {
+		dAtA31 := make([]byte, len(m.ExitValidatorIndices)*10)
 		var j30 int
-		for _, num := range m.InclusionDistances {
+		for _, num := range m.ExitValidatorIndices {
 			for num >= 1<<7 {
 				dAtA31[j30] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5826,54 +5739,16 @@ func (m *ValidatorPerformanceResponse) MarshalTo(dAtA []byte) (int, error) {
 			dAtA31[j30] = uint8(num)
 			j30++
 		}
-		dAtA[i] = 0x1a
-		i++
+		i -= j30
+		copy(dAtA[i:], dAtA31[:j30])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j30))
-		i += copy(dAtA[i:], dAtA31[:j30])
-	}
-	if len(m.CorrectlyVotedSource) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.CorrectlyVotedSource)))
-		for _, b := range m.CorrectlyVotedSource {
-			if b {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i++
-		}
-	}
-	if len(m.CorrectlyVotedTarget) > 0 {
+		i--
 		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.CorrectlyVotedTarget)))
-		for _, b := range m.CorrectlyVotedTarget {
-			if b {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i++
-		}
 	}
-	if len(m.CorrectlyVotedHead) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.CorrectlyVotedHead)))
-		for _, b := range m.CorrectlyVotedHead {
-			if b {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i++
-		}
-	}
-	if len(m.BalancesBeforeEpochTransition) > 0 {
-		dAtA33 := make([]byte, len(m.BalancesBeforeEpochTransition)*10)
+	if len(m.ActivationValidatorIndices) > 0 {
+		dAtA33 := make([]byte, len(m.ActivationValidatorIndices)*10)
 		var j32 int
-		for _, num := range m.BalancesBeforeEpochTransition {
+		for _, num := range m.ActivationValidatorIndices {
 			for num >= 1<<7 {
 				dAtA33[j32] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5882,15 +5757,78 @@ func (m *ValidatorPerformanceResponse) MarshalTo(dAtA []byte) (int, error) {
 			dAtA33[j32] = uint8(num)
 			j32++
 		}
-		dAtA[i] = 0x3a
-		i++
+		i -= j32
+		copy(dAtA[i:], dAtA33[:j32])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j32))
-		i += copy(dAtA[i:], dAtA33[:j32])
+		i--
+		dAtA[i] = 0x22
 	}
-	if len(m.BalancesAfterEpochTransition) > 0 {
-		dAtA35 := make([]byte, len(m.BalancesAfterEpochTransition)*10)
+	if len(m.ExitPublicKeys) > 0 {
+		for iNdEx := len(m.ExitPublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ExitPublicKeys[iNdEx])
+			copy(dAtA[i:], m.ExitPublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.ExitPublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.ActivationPublicKeys) > 0 {
+		for iNdEx := len(m.ActivationPublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ActivationPublicKeys[iNdEx])
+			copy(dAtA[i:], m.ActivationPublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.ActivationPublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if m.ChurnLimit != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.ChurnLimit))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListValidatorAssignmentsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListValidatorAssignmentsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorAssignmentsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.PageToken) > 0 {
+		i -= len(m.PageToken)
+		copy(dAtA[i:], m.PageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.PageSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.Indices) > 0 {
+		dAtA35 := make([]byte, len(m.Indices)*10)
 		var j34 int
-		for _, num := range m.BalancesAfterEpochTransition {
+		for _, num := range m.Indices {
 			for num >= 1<<7 {
 				dAtA35[j34] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5899,71 +5837,160 @@ func (m *ValidatorPerformanceResponse) MarshalTo(dAtA []byte) (int, error) {
 			dAtA35[j34] = uint8(num)
 			j34++
 		}
-		dAtA[i] = 0x42
-		i++
+		i -= j34
+		copy(dAtA[i:], dAtA35[:j34])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j34))
-		i += copy(dAtA[i:], dAtA35[:j34])
+		i--
+		dAtA[i] = 0x22
 	}
-	if len(m.MissingValidators) > 0 {
-		for _, b := range m.MissingValidators {
-			dAtA[i] = 0x4a
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
+	if len(m.PublicKeys) > 0 {
+		for iNdEx := len(m.PublicKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PublicKeys[iNdEx])
+			copy(dAtA[i:], m.PublicKeys[iNdEx])
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x1a
 		}
 	}
-	if m.AverageActiveValidatorBalance != 0 {
-		dAtA[i] = 0x55
-		i++
-		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.AverageActiveValidatorBalance))))
-		i += 4
+	if m.QueryFilter != nil {
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
-func (m *ValidatorQueue) Marshal() (dAtA []byte, err error) {
+func (m *ListValidatorAssignmentsRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorAssignmentsRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+func (m *ListValidatorAssignmentsRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListValidatorAssignmentsRequest_Genesis) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.Genesis {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
+}
+func (m *ValidatorAssignments) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
 	return dAtA[:n], nil
 }
 
-func (m *ValidatorQueue) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+func (m *ValidatorAssignments) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorAssignments) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ChurnLimit != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.ChurnLimit))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if len(m.ActivationPublicKeys) > 0 {
-		for _, b := range m.ActivationPublicKeys {
+	if m.TotalSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.NextPageToken) > 0 {
+		i -= len(m.NextPageToken)
+		copy(dAtA[i:], m.NextPageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Assignments) > 0 {
+		for iNdEx := len(m.Assignments) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Assignments[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+			}
+			i--
 			dAtA[i] = 0x12
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
 		}
 	}
-	if len(m.ExitPublicKeys) > 0 {
-		for _, b := range m.ExitPublicKeys {
-			dAtA[i] = 0x1a
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
-		}
+	if m.Epoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+		i--
+		dAtA[i] = 0x8
 	}
-	if len(m.ActivationValidatorIndices) > 0 {
-		dAtA37 := make([]byte, len(m.ActivationValidatorIndices)*10)
+	return len(dAtA) - i, nil
+}
+
+func (m *ValidatorAssignments_CommitteeAssignment) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ValidatorAssignments_CommitteeAssignment) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorAssignments_CommitteeAssignment) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.ValidatorIndex != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.ValidatorIndex))
+		i--
+		dAtA[i] = 0x30
+	}
+	if len(m.PublicKey) > 0 {
+		i -= len(m.PublicKey)
+		copy(dAtA[i:], m.PublicKey)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKey)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.ProposerSlots) > 0 {
+		dAtA37 := make([]byte, len(m.ProposerSlots)*10)
 		var j36 int
-		for _, num := range m.ActivationValidatorIndices {
+		for _, num := range m.ProposerSlots {
 			for num >= 1<<7 {
 				dAtA37[j36] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5972,15 +5999,26 @@ func (m *ValidatorQueue) MarshalTo(dAtA []byte) (int, error) {
 			dAtA37[j36] = uint8(num)
 			j36++
 		}
-		dAtA[i] = 0x22
-		i++
+		i -= j36
+		copy(dAtA[i:], dAtA37[:j36])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j36))
-		i += copy(dAtA[i:], dAtA37[:j36])
+		i--
+		dAtA[i] = 0x22
 	}
-	if len(m.ExitValidatorIndices) > 0 {
-		dAtA39 := make([]byte, len(m.ExitValidatorIndices)*10)
+	if m.AttesterSlot != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.AttesterSlot))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.CommitteeIndex != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.CommitteeIndex))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.BeaconCommittees) > 0 {
+		dAtA39 := make([]byte, len(m.BeaconCommittees)*10)
 		var j38 int
-		for _, num := range m.ExitValidatorIndices {
+		for _, num := range m.BeaconCommittees {
 			for num >= 1<<7 {
 				dAtA39[j38] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -5989,51 +6027,300 @@ func (m *ValidatorQueue) MarshalTo(dAtA []byte) (int, error) {
 			dAtA39[j38] = uint8(num)
 			j38++
 		}
-		dAtA[i] = 0x2a
-		i++
+		i -= j38
+		copy(dAtA[i:], dAtA39[:j38])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j38))
-		i += copy(dAtA[i:], dAtA39[:j38])
+		i--
+		dAtA[i] = 0xa
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
-func (m *ListValidatorAssignmentsRequest) Marshal() (dAtA []byte, err error) {
+func (m *GetValidatorParticipationRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
 	return dAtA[:n], nil
 }
 
-func (m *ListValidatorAssignmentsRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+func (m *GetValidatorParticipationRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorParticipationRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
 	if m.QueryFilter != nil {
-		nn40, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn40
-	}
-	if len(m.PublicKeys) > 0 {
-		for _, b := range m.PublicKeys {
-			dAtA[i] = 0x1a
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
+		{
+			size := m.QueryFilter.Size()
+			i -= size
+			if _, err := m.QueryFilter.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
 	}
-	if len(m.Indices) > 0 {
-		dAtA42 := make([]byte, len(m.Indices)*10)
+	return len(dAtA) - i, nil
+}
+
+func (m *GetValidatorParticipationRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorParticipationRequest_Epoch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+func (m *GetValidatorParticipationRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetValidatorParticipationRequest_Genesis) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.Genesis {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x10
+	return len(dAtA) - i, nil
+}
+func (m *ValidatorParticipationResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ValidatorParticipationResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ValidatorParticipationResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.Participation != nil {
+		{
+			size, err := m.Participation.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Finalized {
+		i--
+		if m.Finalized {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Epoch != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *AttestationPoolRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AttestationPoolRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AttestationPoolRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.PageToken) > 0 {
+		i -= len(m.PageToken)
+		copy(dAtA[i:], m.PageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.PageSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *AttestationPoolResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AttestationPoolResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AttestationPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.TotalSize != 0 {
+		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.NextPageToken) > 0 {
+		i -= len(m.NextPageToken)
+		copy(dAtA[i:], m.NextPageToken)
+		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Attestations) > 0 {
+		for iNdEx := len(m.Attestations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Attestations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintBeaconChain(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *BeaconConfig) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BeaconConfig) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BeaconConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Config) > 0 {
+		for k := range m.Config {
+			v := m.Config[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintBeaconChain(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintBeaconChain(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SubmitSlashingResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SubmitSlashingResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SubmitSlashingResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.SlashedIndices) > 0 {
+		dAtA42 := make([]byte, len(m.SlashedIndices)*10)
 		var j41 int
-		for _, num := range m.Indices {
+		for _, num := range m.SlashedIndices {
 			for num >= 1<<7 {
 				dAtA42[j41] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -6042,425 +6329,25 @@ func (m *ListValidatorAssignmentsRequest) MarshalTo(dAtA []byte) (int, error) {
 			dAtA42[j41] = uint8(num)
 			j41++
 		}
-		dAtA[i] = 0x22
-		i++
+		i -= j41
+		copy(dAtA[i:], dAtA42[:j41])
 		i = encodeVarintBeaconChain(dAtA, i, uint64(j41))
-		i += copy(dAtA[i:], dAtA42[:j41])
-	}
-	if m.PageSize != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
-	}
-	if len(m.PageToken) > 0 {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
-		i += copy(dAtA[i:], m.PageToken)
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *ListValidatorAssignmentsRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
-	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
-}
-func (m *ListValidatorAssignmentsRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
-	if m.Genesis {
-		dAtA[i] = 1
-	} else {
-		dAtA[i] = 0
-	}
-	i++
-	return i, nil
-}
-func (m *ValidatorAssignments) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatorAssignments) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Epoch != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	}
-	if len(m.Assignments) > 0 {
-		for _, msg := range m.Assignments {
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.NextPageToken) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
-		i += copy(dAtA[i:], m.NextPageToken)
-	}
-	if m.TotalSize != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *ValidatorAssignments_CommitteeAssignment) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatorAssignments_CommitteeAssignment) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.BeaconCommittees) > 0 {
-		dAtA44 := make([]byte, len(m.BeaconCommittees)*10)
-		var j43 int
-		for _, num := range m.BeaconCommittees {
-			for num >= 1<<7 {
-				dAtA44[j43] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j43++
-			}
-			dAtA44[j43] = uint8(num)
-			j43++
-		}
+		i--
 		dAtA[i] = 0xa
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(j43))
-		i += copy(dAtA[i:], dAtA44[:j43])
 	}
-	if m.CommitteeIndex != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.CommitteeIndex))
-	}
-	if m.AttesterSlot != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.AttesterSlot))
-	}
-	if len(m.ProposerSlots) > 0 {
-		dAtA46 := make([]byte, len(m.ProposerSlots)*10)
-		var j45 int
-		for _, num := range m.ProposerSlots {
-			for num >= 1<<7 {
-				dAtA46[j45] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j45++
-			}
-			dAtA46[j45] = uint8(num)
-			j45++
-		}
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(j45))
-		i += copy(dAtA[i:], dAtA46[:j45])
-	}
-	if len(m.PublicKey) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PublicKey)))
-		i += copy(dAtA[i:], m.PublicKey)
-	}
-	if m.ValidatorIndex != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.ValidatorIndex))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *GetValidatorParticipationRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetValidatorParticipationRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.QueryFilter != nil {
-		nn47, err := m.QueryFilter.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn47
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *GetValidatorParticipationRequest_Epoch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x8
-	i++
-	i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	return i, nil
-}
-func (m *GetValidatorParticipationRequest_Genesis) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x10
-	i++
-	if m.Genesis {
-		dAtA[i] = 1
-	} else {
-		dAtA[i] = 0
-	}
-	i++
-	return i, nil
-}
-func (m *ValidatorParticipationResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatorParticipationResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Epoch != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Epoch))
-	}
-	if m.Finalized {
-		dAtA[i] = 0x10
-		i++
-		if m.Finalized {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.Participation != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.Participation.Size()))
-		n48, err := m.Participation.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n48
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *AttestationPoolRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AttestationPoolRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.PageSize != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.PageSize))
-	}
-	if len(m.PageToken) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.PageToken)))
-		i += copy(dAtA[i:], m.PageToken)
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *AttestationPoolResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AttestationPoolResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Attestations) > 0 {
-		for _, msg := range m.Attestations {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.NextPageToken) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(len(m.NextPageToken)))
-		i += copy(dAtA[i:], m.NextPageToken)
-	}
-	if m.TotalSize != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(m.TotalSize))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *BeaconConfig) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *BeaconConfig) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Config) > 0 {
-		for k, _ := range m.Config {
-			dAtA[i] = 0xa
-			i++
-			v := m.Config[k]
-			mapSize := 1 + len(k) + sovBeaconChain(uint64(len(k))) + 1 + len(v) + sovBeaconChain(uint64(len(v)))
-			i = encodeVarintBeaconChain(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintBeaconChain(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *SubmitSlashingResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SubmitSlashingResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.SlashedIndices) > 0 {
-		dAtA50 := make([]byte, len(m.SlashedIndices)*10)
-		var j49 int
-		for _, num := range m.SlashedIndices {
-			for num >= 1<<7 {
-				dAtA50[j49] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j49++
-			}
-			dAtA50[j49] = uint8(num)
-			j49++
-		}
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintBeaconChain(dAtA, i, uint64(j49))
-		i += copy(dAtA[i:], dAtA50[:j49])
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintBeaconChain(dAtA []byte, offset int, v uint64) int {
+	offset -= sovBeaconChain(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func (m *ValidatorChangeSet) Size() (n int) {
 	if m == nil {
@@ -7226,6 +7113,13 @@ func (m *ValidatorPerformanceRequest) Size() (n int) {
 			n += 1 + l + sovBeaconChain(uint64(l))
 		}
 	}
+	if len(m.Indices) > 0 {
+		l = 0
+		for _, e := range m.Indices {
+			l += sovBeaconChain(uint64(e))
+		}
+		n += 1 + sovBeaconChain(uint64(l)) + l
+	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
 	}
@@ -7597,14 +7491,7 @@ func (m *SubmitSlashingResponse) Size() (n int) {
 }
 
 func sovBeaconChain(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozBeaconChain(x uint64) (n int) {
 	return sovBeaconChain(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -11455,6 +11342,82 @@ func (m *ValidatorPerformanceRequest) Unmarshal(dAtA []byte) error {
 			m.PublicKeys = append(m.PublicKeys, make([]byte, postIndex-iNdEx))
 			copy(m.PublicKeys[len(m.PublicKeys)-1], dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 2:
+			if wireType == 0 {
+				var v uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowBeaconChain
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Indices = append(m.Indices, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowBeaconChain
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthBeaconChain
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthBeaconChain
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.Indices) == 0 {
+					m.Indices = make([]uint64, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowBeaconChain
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Indices = append(m.Indices, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Indices", wireType)
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipBeaconChain(dAtA[iNdEx:])
@@ -13947,6 +13910,7 @@ func (m *SubmitSlashingResponse) Unmarshal(dAtA []byte) error {
 func skipBeaconChain(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
+	depth := 0
 	for iNdEx < l {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
@@ -13978,10 +13942,8 @@ func skipBeaconChain(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			return iNdEx, nil
 		case 1:
 			iNdEx += 8
-			return iNdEx, nil
 		case 2:
 			var length int
 			for shift := uint(0); ; shift += 7 {
@@ -14002,55 +13964,30 @@ func skipBeaconChain(dAtA []byte) (n int, err error) {
 				return 0, ErrInvalidLengthBeaconChain
 			}
 			iNdEx += length
-			if iNdEx < 0 {
-				return 0, ErrInvalidLengthBeaconChain
-			}
-			return iNdEx, nil
 		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowBeaconChain
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipBeaconChain(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthBeaconChain
-				}
-			}
-			return iNdEx, nil
+			depth++
 		case 4:
-			return iNdEx, nil
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupBeaconChain
+			}
+			depth--
 		case 5:
 			iNdEx += 4
-			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthBeaconChain
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
 	}
-	panic("unreachable")
+	return 0, io.ErrUnexpectedEOF
 }
 
 var (
-	ErrInvalidLengthBeaconChain = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowBeaconChain   = fmt.Errorf("proto: integer overflow")
+	ErrInvalidLengthBeaconChain        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowBeaconChain          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupBeaconChain = fmt.Errorf("proto: unexpected end of group")
 )
