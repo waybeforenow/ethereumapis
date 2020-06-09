@@ -9,6 +9,7 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -20,7 +21,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type ShardBlock struct {
 	ShardParentRoot      []byte   `protobuf:"bytes,1,opt,name=shard_parent_root,json=shardParentRoot,proto3" json:"shard_parent_root,omitempty" ssz-size:"32"`
@@ -48,7 +49,7 @@ func (m *ShardBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_ShardBlock.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -131,7 +132,7 @@ func (m *SignedShardBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_SignedShardBlock.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +191,7 @@ func (m *ShardBlockHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_ShardBlockHeader.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -275,7 +276,7 @@ func (m *ShardState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_ShardState.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -347,7 +348,7 @@ func (m *ShardTransition) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return xxx_messageInfo_ShardTransition.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -423,7 +424,7 @@ func (m *CompactCommittee) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return xxx_messageInfo_CompactCommittee.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -519,7 +520,7 @@ var fileDescriptor_5d9da510e571288b = []byte{
 func (m *ShardBlock) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -527,55 +528,64 @@ func (m *ShardBlock) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ShardBlock) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ShardBlock) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ShardParentRoot) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(len(m.ShardParentRoot)))
-		i += copy(dAtA[i:], m.ShardParentRoot)
-	}
-	if len(m.BeaconParentRoot) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(len(m.BeaconParentRoot)))
-		i += copy(dAtA[i:], m.BeaconParentRoot)
-	}
-	if m.Slot != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.Slot))
-	}
-	if m.Shard != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.Shard))
-	}
-	if m.ProposerIndex != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.ProposerIndex))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.Body) > 0 {
-		for _, b := range m.Body {
+		for iNdEx := len(m.Body) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Body[iNdEx])
+			copy(dAtA[i:], m.Body[iNdEx])
+			i = encodeVarintShard(dAtA, i, uint64(len(m.Body[iNdEx])))
+			i--
 			dAtA[i] = 0x32
-			i++
-			i = encodeVarintShard(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.ProposerIndex != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.ProposerIndex))
+		i--
+		dAtA[i] = 0x28
 	}
-	return i, nil
+	if m.Shard != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.Shard))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Slot != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.Slot))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.BeaconParentRoot) > 0 {
+		i -= len(m.BeaconParentRoot)
+		copy(dAtA[i:], m.BeaconParentRoot)
+		i = encodeVarintShard(dAtA, i, uint64(len(m.BeaconParentRoot)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.ShardParentRoot) > 0 {
+		i -= len(m.ShardParentRoot)
+		copy(dAtA[i:], m.ShardParentRoot)
+		i = encodeVarintShard(dAtA, i, uint64(len(m.ShardParentRoot)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *SignedShardBlock) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -583,36 +593,45 @@ func (m *SignedShardBlock) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *SignedShardBlock) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SignedShardBlock) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Message != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.Message.Size()))
-		n1, err := m.Message.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.Signature) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.Signature)
+		copy(dAtA[i:], m.Signature)
 		i = encodeVarintShard(dAtA, i, uint64(len(m.Signature)))
-		i += copy(dAtA[i:], m.Signature)
+		i--
+		dAtA[i] = 0x12
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.Message != nil {
+		{
+			size, err := m.Message.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintShard(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ShardBlockHeader) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -620,53 +639,62 @@ func (m *ShardBlockHeader) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ShardBlockHeader) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ShardBlockHeader) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ShardParentRoot) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(len(m.ShardParentRoot)))
-		i += copy(dAtA[i:], m.ShardParentRoot)
-	}
-	if len(m.BeaconParentRoot) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(len(m.BeaconParentRoot)))
-		i += copy(dAtA[i:], m.BeaconParentRoot)
-	}
-	if m.Slot != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.Slot))
-	}
-	if m.Shard != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.Shard))
-	}
-	if m.ProposerIndex != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.ProposerIndex))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.BodyRoot) > 0 {
-		dAtA[i] = 0x32
-		i++
+		i -= len(m.BodyRoot)
+		copy(dAtA[i:], m.BodyRoot)
 		i = encodeVarintShard(dAtA, i, uint64(len(m.BodyRoot)))
-		i += copy(dAtA[i:], m.BodyRoot)
+		i--
+		dAtA[i] = 0x32
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.ProposerIndex != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.ProposerIndex))
+		i--
+		dAtA[i] = 0x28
 	}
-	return i, nil
+	if m.Shard != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.Shard))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Slot != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.Slot))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.BeaconParentRoot) > 0 {
+		i -= len(m.BeaconParentRoot)
+		copy(dAtA[i:], m.BeaconParentRoot)
+		i = encodeVarintShard(dAtA, i, uint64(len(m.BeaconParentRoot)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.ShardParentRoot) > 0 {
+		i -= len(m.ShardParentRoot)
+		copy(dAtA[i:], m.ShardParentRoot)
+		i = encodeVarintShard(dAtA, i, uint64(len(m.ShardParentRoot)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ShardState) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -674,42 +702,50 @@ func (m *ShardState) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ShardState) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ShardState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Slot != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.Slot))
-	}
-	if m.GasPrice != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.GasPrice))
-	}
-	if len(m.TransitionDigest) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(len(m.TransitionDigest)))
-		i += copy(dAtA[i:], m.TransitionDigest)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.LatestBlockRoot) > 0 {
-		dAtA[i] = 0x22
-		i++
+		i -= len(m.LatestBlockRoot)
+		copy(dAtA[i:], m.LatestBlockRoot)
 		i = encodeVarintShard(dAtA, i, uint64(len(m.LatestBlockRoot)))
-		i += copy(dAtA[i:], m.LatestBlockRoot)
+		i--
+		dAtA[i] = 0x22
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.TransitionDigest) > 0 {
+		i -= len(m.TransitionDigest)
+		copy(dAtA[i:], m.TransitionDigest)
+		i = encodeVarintShard(dAtA, i, uint64(len(m.TransitionDigest)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	if m.GasPrice != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.GasPrice))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Slot != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.Slot))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *ShardTransition) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -717,14 +753,48 @@ func (m *ShardTransition) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ShardTransition) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ShardTransition) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.StartSlot != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(m.StartSlot))
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.ProposerSignatureAggregate) > 0 {
+		i -= len(m.ProposerSignatureAggregate)
+		copy(dAtA[i:], m.ProposerSignatureAggregate)
+		i = encodeVarintShard(dAtA, i, uint64(len(m.ProposerSignatureAggregate)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.ShardStates) > 0 {
+		for iNdEx := len(m.ShardStates) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ShardStates[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintShard(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.ShardDataRoots) > 0 {
+		for iNdEx := len(m.ShardDataRoots) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ShardDataRoots[iNdEx])
+			copy(dAtA[i:], m.ShardDataRoots[iNdEx])
+			i = encodeVarintShard(dAtA, i, uint64(len(m.ShardDataRoots[iNdEx])))
+			i--
+			dAtA[i] = 0x1a
+		}
 	}
 	if len(m.ShardBlockLengths) > 0 {
 		dAtA3 := make([]byte, len(m.ShardBlockLengths)*10)
@@ -738,47 +808,24 @@ func (m *ShardTransition) MarshalTo(dAtA []byte) (int, error) {
 			dAtA3[j2] = uint8(num)
 			j2++
 		}
-		dAtA[i] = 0x12
-		i++
+		i -= j2
+		copy(dAtA[i:], dAtA3[:j2])
 		i = encodeVarintShard(dAtA, i, uint64(j2))
-		i += copy(dAtA[i:], dAtA3[:j2])
+		i--
+		dAtA[i] = 0x12
 	}
-	if len(m.ShardDataRoots) > 0 {
-		for _, b := range m.ShardDataRoots {
-			dAtA[i] = 0x1a
-			i++
-			i = encodeVarintShard(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
-		}
+	if m.StartSlot != 0 {
+		i = encodeVarintShard(dAtA, i, uint64(m.StartSlot))
+		i--
+		dAtA[i] = 0x8
 	}
-	if len(m.ShardStates) > 0 {
-		for _, msg := range m.ShardStates {
-			dAtA[i] = 0x22
-			i++
-			i = encodeVarintShard(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.ProposerSignatureAggregate) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintShard(dAtA, i, uint64(len(m.ProposerSignatureAggregate)))
-		i += copy(dAtA[i:], m.ProposerSignatureAggregate)
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *CompactCommittee) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -786,17 +833,18 @@ func (m *CompactCommittee) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CompactCommittee) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompactCommittee) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.PubKeys) > 0 {
-		for _, b := range m.PubKeys {
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintShard(dAtA, i, uint64(len(b)))
-			i += copy(dAtA[i:], b)
-		}
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.CompactValidators) > 0 {
 		dAtA5 := make([]byte, len(m.CompactValidators)*10)
@@ -810,25 +858,34 @@ func (m *CompactCommittee) MarshalTo(dAtA []byte) (int, error) {
 			dAtA5[j4] = uint8(num)
 			j4++
 		}
-		dAtA[i] = 0x1a
-		i++
+		i -= j4
+		copy(dAtA[i:], dAtA5[:j4])
 		i = encodeVarintShard(dAtA, i, uint64(j4))
-		i += copy(dAtA[i:], dAtA5[:j4])
+		i--
+		dAtA[i] = 0x1a
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.PubKeys) > 0 {
+		for iNdEx := len(m.PubKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PubKeys[iNdEx])
+			copy(dAtA[i:], m.PubKeys[iNdEx])
+			i = encodeVarintShard(dAtA, i, uint64(len(m.PubKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintShard(dAtA []byte, offset int, v uint64) int {
+	offset -= sovShard(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func (m *ShardBlock) Size() (n int) {
 	if m == nil {
@@ -1008,14 +1065,7 @@ func (m *CompactCommittee) Size() (n int) {
 }
 
 func sovShard(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozShard(x uint64) (n int) {
 	return sovShard(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -2142,6 +2192,7 @@ func (m *CompactCommittee) Unmarshal(dAtA []byte) error {
 func skipShard(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
+	depth := 0
 	for iNdEx < l {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
@@ -2173,10 +2224,8 @@ func skipShard(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			return iNdEx, nil
 		case 1:
 			iNdEx += 8
-			return iNdEx, nil
 		case 2:
 			var length int
 			for shift := uint(0); ; shift += 7 {
@@ -2197,55 +2246,30 @@ func skipShard(dAtA []byte) (n int, err error) {
 				return 0, ErrInvalidLengthShard
 			}
 			iNdEx += length
-			if iNdEx < 0 {
-				return 0, ErrInvalidLengthShard
-			}
-			return iNdEx, nil
 		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowShard
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipShard(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthShard
-				}
-			}
-			return iNdEx, nil
+			depth++
 		case 4:
-			return iNdEx, nil
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupShard
+			}
+			depth--
 		case 5:
 			iNdEx += 4
-			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthShard
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
 	}
-	panic("unreachable")
+	return 0, io.ErrUnexpectedEOF
 }
 
 var (
-	ErrInvalidLengthShard = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowShard   = fmt.Errorf("proto: integer overflow")
+	ErrInvalidLengthShard        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowShard          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupShard = fmt.Errorf("proto: unexpected end of group")
 )
