@@ -58,6 +58,7 @@ ssz_gen_marshal(
         "Attestation",
         "AttestationData",
         "AggregateAttestationAndProof",
+        "SignedAggregateAttestationAndProof",
         "BeaconBlock",
         "Checkpoint",
         "SignedBeaconBlock",

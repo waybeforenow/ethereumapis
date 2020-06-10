@@ -310,85 +310,6 @@ func (x *AttestationData) GetShardTransitionRoot() []byte {
 	return nil
 }
 
-type Crosslink struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Shard      uint64 `protobuf:"varint,1,opt,name=shard,proto3" json:"shard,omitempty"`
-	ParentRoot []byte `protobuf:"bytes,2,opt,name=parent_root,json=parentRoot,proto3" json:"parent_root,omitempty"`
-	StartEpoch uint64 `protobuf:"varint,3,opt,name=start_epoch,json=startEpoch,proto3" json:"start_epoch,omitempty"`
-	EndEpoch   uint64 `protobuf:"varint,4,opt,name=end_epoch,json=endEpoch,proto3" json:"end_epoch,omitempty"`
-	DataRoot   []byte `protobuf:"bytes,5,opt,name=data_root,json=dataRoot,proto3" json:"data_root,omitempty"`
-}
-
-func (x *Crosslink) Reset() {
-	*x = Crosslink{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_eth_v1alpha1_attestation_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Crosslink) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Crosslink) ProtoMessage() {}
-
-func (x *Crosslink) ProtoReflect() protoreflect.Message {
-	mi := &file_eth_v1alpha1_attestation_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Crosslink.ProtoReflect.Descriptor instead.
-func (*Crosslink) Descriptor() ([]byte, []int) {
-	return file_eth_v1alpha1_attestation_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *Crosslink) GetShard() uint64 {
-	if x != nil {
-		return x.Shard
-	}
-	return 0
-}
-
-func (x *Crosslink) GetParentRoot() []byte {
-	if x != nil {
-		return x.ParentRoot
-	}
-	return nil
-}
-
-func (x *Crosslink) GetStartEpoch() uint64 {
-	if x != nil {
-		return x.StartEpoch
-	}
-	return 0
-}
-
-func (x *Crosslink) GetEndEpoch() uint64 {
-	if x != nil {
-		return x.EndEpoch
-	}
-	return 0
-}
-
-func (x *Crosslink) GetDataRoot() []byte {
-	if x != nil {
-		return x.DataRoot
-	}
-	return nil
-}
-
 type Checkpoint struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -401,7 +322,7 @@ type Checkpoint struct {
 func (x *Checkpoint) Reset() {
 	*x = Checkpoint{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_eth_v1alpha1_attestation_proto_msgTypes[5]
+		mi := &file_eth_v1alpha1_attestation_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -414,7 +335,7 @@ func (x *Checkpoint) String() string {
 func (*Checkpoint) ProtoMessage() {}
 
 func (x *Checkpoint) ProtoReflect() protoreflect.Message {
-	mi := &file_eth_v1alpha1_attestation_proto_msgTypes[5]
+	mi := &file_eth_v1alpha1_attestation_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -427,7 +348,7 @@ func (x *Checkpoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Checkpoint.ProtoReflect.Descriptor instead.
 func (*Checkpoint) Descriptor() ([]byte, []int) {
-	return file_eth_v1alpha1_attestation_proto_rawDescGZIP(), []int{5}
+	return file_eth_v1alpha1_attestation_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Checkpoint) GetEpoch() uint64 {
@@ -458,7 +379,7 @@ type FullAttestation struct {
 func (x *FullAttestation) Reset() {
 	*x = FullAttestation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_eth_v1alpha1_attestation_proto_msgTypes[6]
+		mi := &file_eth_v1alpha1_attestation_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -471,7 +392,7 @@ func (x *FullAttestation) String() string {
 func (*FullAttestation) ProtoMessage() {}
 
 func (x *FullAttestation) ProtoReflect() protoreflect.Message {
-	mi := &file_eth_v1alpha1_attestation_proto_msgTypes[6]
+	mi := &file_eth_v1alpha1_attestation_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -484,7 +405,7 @@ func (x *FullAttestation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullAttestation.ProtoReflect.Descriptor instead.
 func (*FullAttestation) Descriptor() ([]byte, []int) {
-	return file_eth_v1alpha1_attestation_proto_rawDescGZIP(), []int{6}
+	return file_eth_v1alpha1_attestation_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *FullAttestation) GetAggregationBits() []byte {
@@ -531,7 +452,7 @@ type FullAttestationData struct {
 func (x *FullAttestationData) Reset() {
 	*x = FullAttestationData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_eth_v1alpha1_attestation_proto_msgTypes[7]
+		mi := &file_eth_v1alpha1_attestation_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -544,7 +465,7 @@ func (x *FullAttestationData) String() string {
 func (*FullAttestationData) ProtoMessage() {}
 
 func (x *FullAttestationData) ProtoReflect() protoreflect.Message {
-	mi := &file_eth_v1alpha1_attestation_proto_msgTypes[7]
+	mi := &file_eth_v1alpha1_attestation_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -557,7 +478,7 @@ func (x *FullAttestationData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullAttestationData.ProtoReflect.Descriptor instead.
 func (*FullAttestationData) Descriptor() ([]byte, []int) {
-	return file_eth_v1alpha1_attestation_proto_rawDescGZIP(), []int{7}
+	return file_eth_v1alpha1_attestation_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *FullAttestationData) GetSlot() uint64 {
@@ -679,17 +600,7 @@ var file_eth_v1alpha1_attestation_proto_rawDesc = []byte{
 	0x73, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x72, 0x6f, 0x6f, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28,
 	0x0c, 0x42, 0x11, 0xf2, 0xde, 0x1f, 0x0d, 0x73, 0x73, 0x7a, 0x2d, 0x73, 0x69, 0x7a, 0x65, 0x3a,
 	0x22, 0x33, 0x32, 0x22, 0x52, 0x13, 0x73, 0x68, 0x61, 0x72, 0x64, 0x54, 0x72, 0x61, 0x6e, 0x73,
-	0x69, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x6f, 0x6f, 0x74, 0x22, 0x9d, 0x01, 0x0a, 0x09, 0x43, 0x72,
-	0x6f, 0x73, 0x73, 0x6c, 0x69, 0x6e, 0x6b, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x68, 0x61, 0x72, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x73, 0x68, 0x61, 0x72, 0x64, 0x12, 0x1f, 0x0a,
-	0x0b, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x72, 0x6f, 0x6f, 0x74, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x0c, 0x52, 0x0a, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x52, 0x6f, 0x6f, 0x74, 0x12, 0x1f,
-	0x0a, 0x0b, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x65, 0x70, 0x6f, 0x63, 0x68, 0x18, 0x03, 0x20,
-	0x01, 0x28, 0x04, 0x52, 0x0a, 0x73, 0x74, 0x61, 0x72, 0x74, 0x45, 0x70, 0x6f, 0x63, 0x68, 0x12,
-	0x1b, 0x0a, 0x09, 0x65, 0x6e, 0x64, 0x5f, 0x65, 0x70, 0x6f, 0x63, 0x68, 0x18, 0x04, 0x20, 0x01,
-	0x28, 0x04, 0x52, 0x08, 0x65, 0x6e, 0x64, 0x45, 0x70, 0x6f, 0x63, 0x68, 0x12, 0x1b, 0x0a, 0x09,
-	0x64, 0x61, 0x74, 0x61, 0x5f, 0x72, 0x6f, 0x6f, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0c, 0x52,
-	0x08, 0x64, 0x61, 0x74, 0x61, 0x52, 0x6f, 0x6f, 0x74, 0x22, 0x49, 0x0a, 0x0a, 0x43, 0x68, 0x65,
+	0x69, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x6f, 0x6f, 0x74, 0x22, 0x49, 0x0a, 0x0a, 0x43, 0x68, 0x65,
 	0x63, 0x6b, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x70, 0x6f, 0x63, 0x68,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x65, 0x70, 0x6f, 0x63, 0x68, 0x12, 0x25, 0x0a,
 	0x04, 0x72, 0x6f, 0x6f, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x11, 0xf2, 0xde, 0x1f,
@@ -759,28 +670,27 @@ func file_eth_v1alpha1_attestation_proto_rawDescGZIP() []byte {
 	return file_eth_v1alpha1_attestation_proto_rawDescData
 }
 
-var file_eth_v1alpha1_attestation_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_eth_v1alpha1_attestation_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_eth_v1alpha1_attestation_proto_goTypes = []interface{}{
 	(*Attestation)(nil),                        // 0: ethereum.eth.v1alpha1.Attestation
 	(*AggregateAttestationAndProof)(nil),       // 1: ethereum.eth.v1alpha1.AggregateAttestationAndProof
 	(*SignedAggregateAttestationAndProof)(nil), // 2: ethereum.eth.v1alpha1.SignedAggregateAttestationAndProof
 	(*AttestationData)(nil),                    // 3: ethereum.eth.v1alpha1.AttestationData
-	(*Crosslink)(nil),                          // 4: ethereum.eth.v1alpha1.Crosslink
-	(*Checkpoint)(nil),                         // 5: ethereum.eth.v1alpha1.Checkpoint
-	(*FullAttestation)(nil),                    // 6: ethereum.eth.v1alpha1.FullAttestation
-	(*FullAttestationData)(nil),                // 7: ethereum.eth.v1alpha1.FullAttestationData
-	(*ShardTransition)(nil),                    // 8: ethereum.eth.v1alpha1.ShardTransition
+	(*Checkpoint)(nil),                         // 4: ethereum.eth.v1alpha1.Checkpoint
+	(*FullAttestation)(nil),                    // 5: ethereum.eth.v1alpha1.FullAttestation
+	(*FullAttestationData)(nil),                // 6: ethereum.eth.v1alpha1.FullAttestationData
+	(*ShardTransition)(nil),                    // 7: ethereum.eth.v1alpha1.ShardTransition
 }
 var file_eth_v1alpha1_attestation_proto_depIdxs = []int32{
 	3, // 0: ethereum.eth.v1alpha1.Attestation.data:type_name -> ethereum.eth.v1alpha1.AttestationData
 	0, // 1: ethereum.eth.v1alpha1.AggregateAttestationAndProof.aggregate:type_name -> ethereum.eth.v1alpha1.Attestation
 	1, // 2: ethereum.eth.v1alpha1.SignedAggregateAttestationAndProof.message:type_name -> ethereum.eth.v1alpha1.AggregateAttestationAndProof
-	5, // 3: ethereum.eth.v1alpha1.AttestationData.source:type_name -> ethereum.eth.v1alpha1.Checkpoint
-	5, // 4: ethereum.eth.v1alpha1.AttestationData.target:type_name -> ethereum.eth.v1alpha1.Checkpoint
-	7, // 5: ethereum.eth.v1alpha1.FullAttestation.data:type_name -> ethereum.eth.v1alpha1.FullAttestationData
-	5, // 6: ethereum.eth.v1alpha1.FullAttestationData.source:type_name -> ethereum.eth.v1alpha1.Checkpoint
-	5, // 7: ethereum.eth.v1alpha1.FullAttestationData.target:type_name -> ethereum.eth.v1alpha1.Checkpoint
-	8, // 8: ethereum.eth.v1alpha1.FullAttestationData.shard_transition:type_name -> ethereum.eth.v1alpha1.ShardTransition
+	4, // 3: ethereum.eth.v1alpha1.AttestationData.source:type_name -> ethereum.eth.v1alpha1.Checkpoint
+	4, // 4: ethereum.eth.v1alpha1.AttestationData.target:type_name -> ethereum.eth.v1alpha1.Checkpoint
+	6, // 5: ethereum.eth.v1alpha1.FullAttestation.data:type_name -> ethereum.eth.v1alpha1.FullAttestationData
+	4, // 6: ethereum.eth.v1alpha1.FullAttestationData.source:type_name -> ethereum.eth.v1alpha1.Checkpoint
+	4, // 7: ethereum.eth.v1alpha1.FullAttestationData.target:type_name -> ethereum.eth.v1alpha1.Checkpoint
+	7, // 8: ethereum.eth.v1alpha1.FullAttestationData.shard_transition:type_name -> ethereum.eth.v1alpha1.ShardTransition
 	9, // [9:9] is the sub-list for method output_type
 	9, // [9:9] is the sub-list for method input_type
 	9, // [9:9] is the sub-list for extension type_name
@@ -844,18 +754,6 @@ func file_eth_v1alpha1_attestation_proto_init() {
 			}
 		}
 		file_eth_v1alpha1_attestation_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Crosslink); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_eth_v1alpha1_attestation_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Checkpoint); i {
 			case 0:
 				return &v.state
@@ -867,7 +765,7 @@ func file_eth_v1alpha1_attestation_proto_init() {
 				return nil
 			}
 		}
-		file_eth_v1alpha1_attestation_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_eth_v1alpha1_attestation_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FullAttestation); i {
 			case 0:
 				return &v.state
@@ -879,7 +777,7 @@ func file_eth_v1alpha1_attestation_proto_init() {
 				return nil
 			}
 		}
-		file_eth_v1alpha1_attestation_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_eth_v1alpha1_attestation_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FullAttestationData); i {
 			case 0:
 				return &v.state
@@ -898,7 +796,7 @@ func file_eth_v1alpha1_attestation_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_eth_v1alpha1_attestation_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
