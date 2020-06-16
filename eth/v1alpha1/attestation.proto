@@ -32,10 +32,8 @@ message Attestation {
 
     AttestationData data = 2;
 
-    bytes custody_bits_blocks = 3 [(gogoproto.moretags) = "ssz-max:\"2048\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitlist"];
-
     // 96 byte BLS aggregate signature.
-    bytes signature = 4 [(gogoproto.moretags) = "ssz-size:\"96\""];
+    bytes signature = 3 [(gogoproto.moretags) = "ssz-size:\"96\""];
 }
 
 message AggregateAttestationAndProof {
@@ -101,10 +99,8 @@ message FullAttestation {
 
     FullAttestationData data = 2;
 
-    repeated bytes custody_bits_blocks = 3;
-
     // 96 byte BLS aggregate signature.
-    bytes signature = 4 [(gogoproto.moretags) = "ssz-size:\"96\""];
+    bytes signature = 3 [(gogoproto.moretags) = "ssz-size:\"96\""];
 }
 
 message FullAttestationData {
