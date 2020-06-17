@@ -46,8 +46,7 @@ message ShardBlockHeader {
 message ShardState {
     uint64 slot = 1;
     uint64 gas_price = 2;
-    bytes transition_digest = 3 [(gogoproto.moretags) = "ssz-size:\"32\""];
-    bytes latest_block_root = 4 [(gogoproto.moretags) = "ssz-size:\"32\""];
+    bytes latest_block_root = 3 [(gogoproto.moretags) = "ssz-size:\"32\""];
 }
 
 message ShardTransition {
