@@ -74,11 +74,14 @@ message AttestationData {
     // The checkpoint attempting to be justified for the current epoch and its epoch boundary block
     Checkpoint target = 5;
 
+    // The shard which this attestation belongs to
+    uint64 shard = 6;
+
     // head root of the shard being voted on.
-    bytes shard_head_root = 6 [(gogoproto.moretags) = "ssz-size:\"32\""];
+    bytes shard_head_root = 7 [(gogoproto.moretags) = "ssz-size:\"32\""];
 
     // transition root of the shard being voted on.
-    bytes shard_transition_root = 7 [(gogoproto.moretags) = "ssz-size:\"32\""];
+    bytes shard_transition_root = 8 [(gogoproto.moretags) = "ssz-size:\"32\""];
 }
 
 message Checkpoint {
