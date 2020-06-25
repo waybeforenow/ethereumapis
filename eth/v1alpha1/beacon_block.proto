@@ -84,6 +84,10 @@ message BeaconBlockBody {
     repeated SignedVoluntaryExit voluntary_exits = 8 [(gogoproto.moretags) = "ssz-max:\"16\""];
 
     repeated ShardTransition shard_transitions = 9 [(gogoproto.moretags) = "ssz-max:\"64\""];
+
+    bytes light_client_bits = 10 [(gogoproto.moretags) = "ssz-size:\"1\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitvector64"];
+
+    bytes light_client_signature = 11 [(gogoproto.moretags) = "ssz-size:\"96\""];
 }
 
 // Proposer slashings are proofs that a slashable offense has been committed by

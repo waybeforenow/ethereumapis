@@ -380,7 +380,7 @@ func (b *BeaconBlockBody) MarshalSSZ() ([]byte, error) {
 // MarshalSSZTo ssz marshals the BeaconBlockBody object to a target array
 func (b *BeaconBlockBody) MarshalSSZTo(dst []byte) ([]byte, error) {
 	var err error
-	offset := int(224)
+	offset := int(321)
 
 	// Field (0) 'RandaoReveal'
 	if dst, err = ssz.MarshalFixedBytes(dst, b.RandaoReveal, 96); err != nil {
@@ -428,6 +428,16 @@ func (b *BeaconBlockBody) MarshalSSZTo(dst []byte) ([]byte, error) {
 	for ii := 0; ii < len(b.ShardTransitions); ii++ {
 		offset += 4
 		offset += b.ShardTransitions[ii].SizeSSZ()
+	}
+
+	// Field (9) 'LightClientBits'
+	if dst, err = ssz.MarshalFixedBytes(dst, b.LightClientBits, 1); err != nil {
+		return nil, errMarshalFixedBytes
+	}
+
+	// Field (10) 'LightClientSignature'
+	if dst, err = ssz.MarshalFixedBytes(dst, b.LightClientSignature, 96); err != nil {
+		return nil, errMarshalFixedBytes
 	}
 
 	// Field (3) 'ProposerSlashings'
@@ -518,7 +528,7 @@ func (b *BeaconBlockBody) MarshalSSZTo(dst []byte) ([]byte, error) {
 func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
-	if size < 224 {
+	if size < 321 {
 		return errSize
 	}
 
@@ -568,6 +578,12 @@ func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 	if o8 = ssz.ReadOffset(buf[220:224]); o8 > size || o7 > o8 {
 		return errOffset
 	}
+
+	// Field (9) 'LightClientBits'
+	b.LightClientBits = append(b.LightClientBits, buf[224:225]...)
+
+	// Field (10) 'LightClientSignature'
+	b.LightClientSignature = append(b.LightClientSignature, buf[225:321]...)
 
 	// Field (3) 'ProposerSlashings'
 	{
@@ -702,7 +718,7 @@ func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 
 // SizeSSZ returns the ssz encoded size in bytes for the BeaconBlockBody object
 func (b *BeaconBlockBody) SizeSSZ() (size int) {
-	size = 224
+	size = 321
 
 	// Field (3) 'ProposerSlashings'
 	size += len(b.ProposerSlashings) * 416
