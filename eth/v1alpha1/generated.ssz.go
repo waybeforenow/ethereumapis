@@ -668,11 +668,11 @@ func (c *CompactCommittee) MarshalSSZTo(dst []byte) ([]byte, error) {
 	var err error
 
 	// Field (0) 'PubKeys'
-	if len(c.PubKeys) != 48 {
+	if len(c.PubKeys) != 2048 {
 		return nil, errMarshalVector
 	}
-	for ii := 0; ii < 48; ii++ {
-		if dst, err = ssz.MarshalFixedBytes(dst, c.PubKeys[ii], 2048); err != nil {
+	for ii := 0; ii < 2048; ii++ {
+		if dst, err = ssz.MarshalFixedBytes(dst, c.PubKeys[ii], 48); err != nil {
 			return nil, errMarshalFixedBytes
 		}
 	}
@@ -697,9 +697,9 @@ func (c *CompactCommittee) UnmarshalSSZ(buf []byte) error {
 	}
 
 	// Field (0) 'PubKeys'
-	c.PubKeys = make([][]byte, 48)
-	for ii := 0; ii < 48; ii++ {
-		c.PubKeys[ii] = append(c.PubKeys[ii], buf[0:98304][ii*2048:(ii+1)*2048]...)
+	c.PubKeys = make([][]byte, 2048)
+	for ii := 0; ii < 2048; ii++ {
+		c.PubKeys[ii] = append(c.PubKeys[ii], buf[0:98304][ii*48:(ii+1)*48]...)
 	}
 
 	// Field (1) 'CompactValidators'
