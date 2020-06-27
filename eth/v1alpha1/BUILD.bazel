@@ -68,7 +68,9 @@ ssz_gen_marshal(
         "VoluntaryExit",
         "Deposit",
         "ProposerSlashing",
-        "CompateCommittee",
+        "ShardTransition",
+        "ShardState",
+        "CompactCommittee",
     ],
 )
 

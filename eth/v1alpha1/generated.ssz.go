@@ -657,6 +657,66 @@ func (s *ShardTransition) SizeSSZ() (size int) {
 	return
 }
 
+// MarshalSSZ ssz marshals the CompactCommittee object
+func (c *CompactCommittee) MarshalSSZ() ([]byte, error) {
+	buf := make([]byte, c.SizeSSZ())
+	return c.MarshalSSZTo(buf[:0])
+}
+
+// MarshalSSZTo ssz marshals the CompactCommittee object to a target array
+func (c *CompactCommittee) MarshalSSZTo(dst []byte) ([]byte, error) {
+	var err error
+
+	// Field (0) 'PubKeys'
+	if len(c.PubKeys) != 48 {
+		return nil, errMarshalVector
+	}
+	for ii := 0; ii < 48; ii++ {
+		if dst, err = ssz.MarshalFixedBytes(dst, c.PubKeys[ii], 2048); err != nil {
+			return nil, errMarshalFixedBytes
+		}
+	}
+
+	// Field (1) 'CompactValidators'
+	if len(c.CompactValidators) != 2048 {
+		return nil, errMarshalVector
+	}
+	for ii := 0; ii < 2048; ii++ {
+		dst = ssz.MarshalUint64(dst, c.CompactValidators[ii])
+	}
+
+	return dst, err
+}
+
+// UnmarshalSSZ ssz unmarshals the CompactCommittee object
+func (c *CompactCommittee) UnmarshalSSZ(buf []byte) error {
+	var err error
+	size := uint64(len(buf))
+	if size != 114688 {
+		return errSize
+	}
+
+	// Field (0) 'PubKeys'
+	c.PubKeys = make([][]byte, 48)
+	for ii := 0; ii < 48; ii++ {
+		c.PubKeys[ii] = append(c.PubKeys[ii], buf[0:98304][ii*2048:(ii+1)*2048]...)
+	}
+
+	// Field (1) 'CompactValidators'
+	c.CompactValidators = ssz.ExtendUint64(c.CompactValidators, 2048)
+	for ii := 0; ii < 2048; ii++ {
+		c.CompactValidators[ii] = ssz.UnmarshallUint64(buf[98304:114688][ii*8 : (ii+1)*8])
+	}
+
+	return err
+}
+
+// SizeSSZ returns the ssz encoded size in bytes for the CompactCommittee object
+func (c *CompactCommittee) SizeSSZ() (size int) {
+	size = 114688
+	return
+}
+
 // MarshalSSZ ssz marshals the BeaconBlock object
 func (b *BeaconBlock) MarshalSSZ() ([]byte, error) {
 	buf := make([]byte, b.SizeSSZ())

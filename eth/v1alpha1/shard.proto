@@ -58,6 +58,6 @@ message ShardTransition {
 }
 
 message CompactCommittee {
-    repeated bytes pub_keys = 2  [(gogoproto.moretags) = "ssz-max:\"48,2048\""];
-    repeated uint64 compact_validators = 3 [(gogoproto.moretags) = "ssz-size:\"2048\""];
+    repeated bytes pub_keys = 1  [(gogoproto.moretags) = "ssz-size:\"48,2048\""];
+    repeated uint64 compact_validators = 2 [(gogoproto.moretags) = "ssz-size:\"2048\""];
 }
