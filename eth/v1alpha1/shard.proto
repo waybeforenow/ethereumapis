@@ -26,7 +26,7 @@ message ShardBlock {
     uint64 slot = 3;
     uint64 shard = 4;
     uint64 proposer_index = 5;
-    repeated bytes body = 6;
+    bytes body = 6 [(gogoproto.moretags) = "ssz-max:\"1048576\""];
 }
 
 message SignedShardBlock {
