@@ -1,0 +1,108 @@
+// Copyright 2020 Prysmatic Labs.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+syntax = "proto3";
+
+package ethereum.eth.v1;
+
+import "google/protobuf/empty.proto";
+
+// Beacon chain node API
+//
+// The beacon chain node API is a set of endpoints to query node information.
+service Node {
+  // Identity retrieves data about the node's network presence.
+  rpc Identity(google.protobuf.Empty) returns (IdentityResponse) {
+    option (google.api.http) = {get: "/eth/v1/node/identity"};
+  }
+
+  // Peers retrieves data about the node's network peers.
+  rpc Peers(google.protobuf.Empty) returns (PeersResponse) {
+    option (google.api.http) = {get: "/eth/v1/node/peers"};
+  }
+
+  // Peer retrieves data about the given peer.
+  rpc Peer(PeerRequest) returns (PeerResponse) {
+    option (google.api.http) = {get: "/eth/v1/node/peers/{peer_id}"};
+  }
+
+  // Version requests that the beacon node identify information about its implementation in a
+  // format similar to a HTTP User-Agent field.
+  rpc Version(google.protobuf.Empty) returns (VersionResponse) {
+    option (google.api.http) = {get: "/eth/v1/node/identity"};
+  }
+
+  // Syncing requests the beacon node to describe if it's currently syncing or not, and
+  // if it is, what block it is up to.
+  rpc Syncing(google.protobuf.Empty) returns (SyncingResponse) {
+    option (google.api.http) = {get: "/eth/v1/node/syncing"};
+  }
+
+  // Health returns node health status in http status codes. Useful for load balancers.
+  rpc Health(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {get: "/eth/v1/node/health"};
+  }
+}
+
+message IdentityResponse {
+  Identity data = 1;
+}
+
+message Identity {
+  string peer_id = 1;
+  string enr = 2;
+  repeated string p2p_addresses = 3;
+  repeated string discovery_addresses = 4;
+  Metadata metadata = 5;
+}
+
+message Metadata {
+  uint64 seq_number = 1;
+  string attnets = 2;
+}
+
+message PeersResponse {
+  repeated Peer = 1;
+}
+
+message PeerRequest {
+  string peer_id = 1;
+}
+
+message PeerResponse {
+  Peer data = 1;
+}
+message Peer {
+  string peer_id = 1;
+  string enr = 2;
+  string address = 3;
+  string state = 4;
+  string direction = 5;;
+}
+
+message VersionResponse {
+  Version data = 1;
+}
+
+message Version {
+  string version = 1;
+}
+
+message SyncingResponse {
+  SyncInfo data = 1;
+}
+
+message SyncInfo {
+  uint64 head_slot = 1;
+  uint64 sync_distance = 2;
+}
