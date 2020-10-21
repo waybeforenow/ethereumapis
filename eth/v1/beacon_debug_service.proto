@@ -27,7 +27,6 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 import "eth/v1/beacon_state.proto";
-import "eth/v1/beacon_chain_service.proto";
 
 // Beacon chain debug API
 //

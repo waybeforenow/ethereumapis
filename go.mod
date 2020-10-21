@@ -10,5 +10,6 @@ require (
 	github.com/prysmaticlabs/go-bitfield v0.0.0-20200322041314-62c2aee71669
 	google.golang.org/genproto v0.0.0-20200528191852-705c0b31589b
 	google.golang.org/grpc v1.29.1
-	google.golang.org/protobuf v1.24.0
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.0 // indirect
+	google.golang.org/protobuf v1.25.0
 )

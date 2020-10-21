@@ -1,6 +1,7 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+load("@io_bazel_rules_go//proto/wkt:well_known_types.bzl", "PROTO_RUNTIME_DEPS")
 load("//tools:ssz.bzl", "SSZ_DEPS", "ssz_gen_marshal")
 
 ssz_gen_marshal(
@@ -27,12 +28,23 @@ ssz_gen_marshal(
     ],
 )
 
+# HACK: this proto_library is excludes protos with optional. Manually generate go proto files using
+# protoc with version 3.12.0 or later.
+#
+# Example command:
+#
+# protoc -I. \
+#   -Ibazel-ethereumapis/external/gogo_special_proto \
+#   -Ibazel-ethereumapis/external/go_googleapis \
+#   --experimental_allow_proto3_optional \
+#   --go_out=. --go_opt=paths=source_relative \
+#   --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+#   eth/v1/beacon_chain_service.proto
 proto_library(
-    name = "v1_proto",
+    name = "v1_proto_without_optional",
     srcs = [
         "attestation.proto",
         "beacon_block.proto",
-        "beacon_chain_service.proto",
         "beacon_debug_service.proto",
         "beacon_state.proto",
         "node.proto",
@@ -52,7 +64,7 @@ go_proto_library(
     name = "v1_go_proto",
     compilers = ["@io_bazel_rules_go//proto:gogofast_grpc"],
     importpath = "github.com/prysmaticlabs/ethereumapis/eth/v1",
-    proto = ":v1_proto",
+    proto = ":v1_proto_without_optional",  # keep
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_gogo_protobuf//gogoproto:go_default_library",  # keep
@@ -65,9 +77,11 @@ go_library(
     name = "go_default_library",
     srcs = [
         ":ssz_generated_files",  # keep
+        "beacon_chain_service.pb.go",
+        "beacon_chain_service_grpc.pb.go",
     ],
     embed = [":v1_go_proto"],
     importpath = "github.com/prysmaticlabs/ethereumapis/eth/v1",
     visibility = ["//visibility:public"],
-    deps = SSZ_DEPS,  # keep
+    deps = SSZ_DEPS + PROTO_RUNTIME_DEPS,  # keep
 )

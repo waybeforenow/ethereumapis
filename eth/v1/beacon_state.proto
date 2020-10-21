@@ -91,3 +91,10 @@ message Fork {
   bytes current_version = 2 [(gogoproto.moretags) = "ssz-size:\"4\""];
   uint64 epoch = 3;
 }
+
+message StateRequest {
+  // The state id which can be any of: "head" (canonical head in node's view),
+  // "genesis", "finalized", "justified", <slot>, <hex encoded stateRoot with 0x prefix>.
+  // Uses the provided state_id for the request.
+  bytes state_id = 1; // TODO: Duck type handling.
+}
