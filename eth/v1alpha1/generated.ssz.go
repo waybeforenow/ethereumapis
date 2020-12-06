@@ -947,19 +947,19 @@ func (b *BeaconBlockBody) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = ssz.WriteOffset(dst, offset)
 	offset += len(b.VoluntaryExits) * 112
 
-	// Field (8) 'LightClientBits'
-	if len(b.LightClientBits) != 8 {
+	// Field (8) 'SyncCommitteeBits'
+	if len(b.SyncCommitteeBits) != 8 {
 		err = ssz.ErrBytesLength
 		return
 	}
-	dst = append(dst, b.LightClientBits...)
+	dst = append(dst, b.SyncCommitteeBits...)
 
-	// Field (9) 'LightClientSignature'
-	if len(b.LightClientSignature) != 96 {
+	// Field (9) 'SyncCommitteeSignature'
+	if len(b.SyncCommitteeSignature) != 96 {
 		err = ssz.ErrBytesLength
 		return
 	}
-	dst = append(dst, b.LightClientSignature...)
+	dst = append(dst, b.SyncCommitteeSignature...)
 
 	// Field (3) 'ProposerSlashings'
 	if len(b.ProposerSlashings) > 16 {
@@ -1083,11 +1083,11 @@ func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 		return ssz.ErrOffset
 	}
 
-	// Field (8) 'LightClientBits'
-	b.LightClientBits = append(b.LightClientBits, buf[220:228]...)
+	// Field (8) 'SyncCommitteeBits'
+	b.SyncCommitteeBits = append(b.SyncCommitteeBits, buf[220:228]...)
 
-	// Field (9) 'LightClientSignature'
-	b.LightClientSignature = append(b.LightClientSignature, buf[228:324]...)
+	// Field (9) 'SyncCommitteeSignature'
+	b.SyncCommitteeSignature = append(b.SyncCommitteeSignature, buf[228:324]...)
 
 	// Field (3) 'ProposerSlashings'
 	{
@@ -1325,19 +1325,19 @@ func (b *BeaconBlockBody) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 		hh.MerkleizeWithMixin(subIndx, num, 16)
 	}
 
-	// Field (8) 'LightClientBits'
-	if len(b.LightClientBits) != 8 {
+	// Field (8) 'SyncCommitteeBits'
+	if len(b.SyncCommitteeBits) != 8 {
 		err = ssz.ErrBytesLength
 		return
 	}
-	hh.PutBytes(b.LightClientBits)
+	hh.PutBytes(b.SyncCommitteeBits)
 
-	// Field (9) 'LightClientSignature'
-	if len(b.LightClientSignature) != 96 {
+	// Field (9) 'SyncCommitteeSignature'
+	if len(b.SyncCommitteeSignature) != 96 {
 		err = ssz.ErrBytesLength
 		return
 	}
-	hh.PutBytes(b.LightClientSignature)
+	hh.PutBytes(b.SyncCommitteeSignature)
 
 	hh.Merkleize(indx)
 	return
