@@ -83,7 +83,7 @@ message BeaconBlockBody {
     repeated SignedVoluntaryExit voluntary_exits = 8 [(gogoproto.moretags) = "ssz-max:\"16\""];
 
     // TODO: Change this to 1024.
-    bytes light_client_bits = 10 [(gogoproto.moretags) = "ssz-size:\"1\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitvector64"];
+    bytes light_client_bits = 10 [(gogoproto.moretags) = "ssz-size:\"8\"", (gogoproto.casttype) = "github.com/prysmaticlabs/go-bitfield.Bitvector64"];
 
     bytes light_client_signature = 11 [(gogoproto.moretags) = "ssz-size:\"96\""];
 }
